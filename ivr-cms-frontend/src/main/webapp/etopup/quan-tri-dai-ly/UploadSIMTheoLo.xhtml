@@ -1,0 +1,150 @@
+<ui:composition template="/include/etopup/layout-etopup-quantridaily.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui">
+
+
+  <ui:define name="lib-header">
+  </ui:define>
+  <ui:define name="content">
+    <h:form id="simBatchForm">
+      <p:hotkey bind="f9"/>
+      <p:growl id="growl" showDetail="true" autoUpdate="true" globalOnly="true"/>
+      <table style="width: 100%; height: 100%">
+        <tbody>
+        <tr>
+          <td class="menu-left"><ui:insert>
+            <ui:include src="/include/etopup/menu-top-left-etopup-quantridaily.xhtml"/>
+          </ui:insert></td>
+          <td class="wr-main">
+            <div class="main">
+              <div class="top-bar-content">
+                <div class="origin">
+                  <a href="#{request.contextPath}/home/index.xhtml">Trang chủ</a>&#187;
+                  <a class="here">Quản trị đại lý</a>&#187;
+                  <a class="here">Upload SIM theo lô</a>
+                </div>
+              </div>
+              <p:panel styleClass="main-panel-content" id="searchSIMBatchsPanel">
+                <p:focus context="searchSIMBatchsPanel"/>
+                <p:fieldset id="searchSimBatchFieldSetId" legend="Tìm kiếm"
+                            styleClass="resultFieldSet">
+
+                  <p:panelGrid columns="5" styleClass="resultGrid"
+                    columnClasses="resultGrid-label, resultGrid-input, resultGrid-label, resultGrid-label, resultGrid-input">
+                    <p:outputLabel value="Số thuê bao"/>
+                    <p:inputText id="msisdn"
+                                 value="#{simBatchEtopupController.simBatchDTO.msisdn}"
+                                 styleClass="commonInputText"/>
+                                 
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Tên file"/>
+                    <p:inputText id="fileName"
+                                 value="#{simBatchEtopupController.simBatchDTO.fileName}"
+                                 styleClass="commonInputText"/>
+
+                    <p:outputLabel value="Từ ngày"/>
+                    <p:calendar id="fromDate"
+                                value="#{simBatchEtopupController.simBatchDTO.fromDate}"
+                                showButtonPanel="true"
+                                navigator="true"
+                                mode="popup"
+                                pattern="dd/MM/yyyy"
+                                placeholder="Click để chọn ngày..."/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Đến ngày"/>
+                    <p:calendar id="toDate"
+                                value="#{simBatchEtopupController.simBatchDTO.toDate}"
+                                showButtonPanel="true"
+                                navigator="true"
+                                mode="popup"
+                                pattern="dd/MM/yyyy"
+                                placeholder="Click để chọn ngày..."/>
+
+                  </p:panelGrid>
+                  <p:panelGrid columns="1" styleClass="searchCriteriaGrid">
+                    <p:commandButton id="findsimBatchssBtn"
+                                     value="Tìm"
+                                     styleClass="commonButton"
+                                     style="margin-bottom:20px;margin-top:10px"
+                                     onclick="dataGridWidget.getPaginator().setPage(0);PF('blockEntirePage').show()"
+                                     oncomplete="PF('blockEntirePage').hide()"
+                                     update="searchSimBatchFieldSetId :simBatchForm:growl"
+                                     actionListener="#{simBatchEtopupController.doFindSIMBatchs}"/>
+                  </p:panelGrid>
+                  <p:dataTable styleClass="table-list ft-left resultDataTable"
+                               id="uploadedSimBatchFileList"
+                               paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                               paginator="true"
+                               rows="5"
+                               lazy="true"
+                               emptyMessage="Không có bản ghi nào."
+                               paginatorPosition="bottom"
+                               resizableColumns="true"
+                               selectionMode="single"
+                               value="#{simBatchEtopupController.simBatchEtopupLazyDataModel}"
+                               var="simBatch"
+                               widgetVar="dataGridWidget">
+                    <p:column headerText="Tên file" sortBy="#{simBatch.fileName}">
+                      <p:outputLabel value="#{simBatch.fileName}"/>
+                    </p:column>
+                    <p:column headerText="Ngày tạo" sortBy="#{simBatch.createDate}">
+                      <p:outputLabel value="#{simBatch.createDate}"><f:convertDateTime
+                        pattern="dd/MM/yyyy"/></p:outputLabel>
+                    </p:column>
+                    <p:column headerText="Số lượng SIM" sortBy="#{simBatch.entries}">
+                      <p:outputLabel value="#{simBatch.entries}"/>
+                    </p:column>
+                  </p:dataTable>
+                </p:fieldset>
+
+                <p:fieldset legend="Nhập từ file" styleClass="searchFieldSet">
+                  <p:panelGrid columns="3" styleClass="searchCriteriaGrid"
+                               columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label">
+                    <p:outputLabel value="Tên file">
+                                            <span class="red-star"
+                                                  style="margin: 0">*</span>
+                    </p:outputLabel>
+                    <p:inputText readonly="true" styleClass="search-list-popup" style="width:300px"
+                                 id="simBatchUploadedFileName"
+                                 value="#{simBatchEtopupController.uploadedFile.fileName}"/>
+
+                    <p:fileUpload fileUploadListener="#{simBatchEtopupController.handleFileUpload}" id="selectFile"
+                                  value="#{simBatchEtopupController.uploadedFile}"
+                                  mode="advanced" dragDropSupport="false"
+                                  update="simBatchUploadedFileName, fileContentError, downloadErrorFileBtn"
+                                  sizeLimit="1000000" auto="true"
+                                  allowTypes="/(\.|\/)(txt)$/"
+                                  label="Chọn file" styleClass="fileUpload-onebutton">
+                    </p:fileUpload>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:messages id="fileContentError" autoUpdate="false"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                  </p:panelGrid>
+
+                  <p:panelGrid columns="2" styleClass="searchCriteriaGrid" style="margin-bottom:20px">
+                    <p:commandButton id="processFile" value="Gửi đi" styleClass="commonButton" style="margin-top:10px"
+                                     actionListener="#{simBatchEtopupController.doUploadSIMBatch}"
+                                     update="downloadErrorFileBtn,fileContentError,selectFile"/>
+                    <p:commandButton id="downloadErrorFileBtn" value="Download file lỗi" styleClass="commonButton"
+                                     style="margin-top:10px"
+                                     disabled="#{!simBatchEtopupController.uploadedFileError}" ajax="false"
+                                     update="selectFile">
+                      <p:fileDownload value="#{simBatchEtopupController.errorFile}"/>
+                    </p:commandButton>
+                  </p:panelGrid>
+
+                </p:fieldset>
+              </p:panel>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </h:form>
+  </ui:define>
+</ui:composition>

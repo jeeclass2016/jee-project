@@ -1,0 +1,143 @@
+<ui:composition template="/include/etopup/layout-etopup-danhmuc.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui">
+
+
+  <ui:define name="lib-header">
+  </ui:define>
+  <ui:define name="content">
+    <p:growl id="growl" showDetail="true" autoUpdate="true" globalOnly="true"/>
+    <table style="width: 100%; height: 100%">
+      <tbody>
+      <tr>
+        <td class="menu-left"><ui:insert>
+          <ui:include src="/include/etopup/menu-top-left-etopup-danhmuc.xhtml"/>
+        </ui:insert></td>
+        <td class="wr-main">
+          <div class="main">
+
+            <div class="top-bar-content">
+              <div class="origin">
+                <a href="#{request.contextPath}/home/index.xhtml">Trang chủ</a>&#187;
+                <a class="here">Danh mục</a>&#187;
+                <a class="here">Map đại lý và kho theo lô</a>
+              </div>
+            </div>
+
+            <p:panel styleClass="main-panel-content">
+              <h:form id="searchAgentForm">
+                <p:fieldset id="searchAgentFieldSetId" legend="Tìm kiếm danh sách đại lý mapping"
+                            styleClass="searchFieldSet">
+                  <p:focus context="searchAgentFieldSetId"/>
+                  <p:panelGrid columns="3" style="margin-bottom:20px" styleClass="searchCriteriaGrid"
+                               columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label">
+                    <p:outputLabel value="Số thuê bao"/>
+                    <p:inputText id="msisdn" label="Số thuê bao" style="width:300px"
+                                 required="true"
+                                 value="#{agentAndStockMapBatchUploadingController.agentDTO.msisdn}">
+                      <o:validator validatorId="requiredContentValidator"/>
+                      <f:validator validatorId="phoneValidator"/>
+                    </p:inputText>
+                    <p:commandButton id="searchAgentBtn" value="Tìm đại lý" styleClass="commonButton"
+                                     onclick="PF('blockEntirePage').show()" oncomplete="PF('blockEntirePage').hide()"
+                                     validateClient="true"
+                                     update="searchAgentFieldSetId stockAgentMapsFieldSet"
+                                     actionListener="#{agentAndStockMapBatchUploadingController.doFindAgents}">
+                    </p:commandButton>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message id="messageForMsisdn" for="msisdn"/>
+                  </p:panelGrid>
+                </p:fieldset>
+                <p:fieldset id="stockAgentMapsFieldSet" styleClass="resultFieldSet">
+                  <p:dataTable styleClass="table-list ft-left resultDataTable"
+                               paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                               paginator="true"
+                               rows="15"
+                               rowKey="stockAgentMap"
+                               paginatorPosition="bottom"
+                               resizableColumns="true"
+                               emptyMessage="Không có đại lý nào"
+                               lazy="true"
+                               selectionMode="single"
+                               value="#{agentAndStockMapBatchUploadingController.stockAgentMapLazyDataModel}"
+                               var="stockAgentMap">
+
+                    <p:column headerText="Số thuê bao"
+                              sortBy="#{agentAndStockMapBatchUploadingController.agent.msisdn}">
+                      <p:outputLabel value="#{agentAndStockMapBatchUploadingController.agent.msisdn}"/>
+                    </p:column>
+                    <p:column headerText="Mã kho" sortBy="#{stockAgentMap.id.stockId}">
+                      <p:outputLabel value="#{stockAgentMap.id.stockId}"/>
+                    </p:column>
+                    <p:column headerText="Ngày bắt đầu" style="width:120px">
+                      <p:outputLabel value="#{stockAgentMap.createDate}">
+                        <f:convertDateTime pattern="dd/MM/yyyy"/></p:outputLabel>
+                    </p:column>
+                    <p:column headerText="Ngày kết thúc" style="width:120px">
+                      <p:outputLabel value="#{stockAgentMap.endDate}">
+                        <f:convertDateTime pattern="dd/MM/yyyy"/></p:outputLabel>
+                    </p:column>
+                    <p:column headerText="Trạng thái">
+                      <p:outputLabel value="Hiệu lực" rendered="#{stockAgentMap.status == 1}"/>
+                      <p:outputLabel value="Hết hiệu lực" rendered="#{stockAgentMap.status == 0}"/>
+                    </p:column>
+                  </p:dataTable>
+
+                </p:fieldset>
+              </h:form>
+
+              <h:form id="uploadFileForm">
+                <p:fieldset id="importAgentStockMapFileFieldId" legend="Nhập từ file" styleClass="resultFieldSet">
+                  <p:panelGrid columns="3" styleClass="resultGrid"
+                               columnClasses="resultGrid-label, resultGrid-input, resultGrid-label">
+                    <p:outputLabel value="Tên file">
+                      <span class="red-star" style="margin: 0">*</span>
+                    </p:outputLabel>
+                    <p:inputText readonly="true" styleClass="search-list-popup" style="width:400px"
+                                 id="fileNameId"
+                                 required="true"
+                                 value="#{agentAndStockMapBatchUploadingController.selectedFileName}"/>
+
+                    <p:fileUpload fileUploadListener="#{agentAndStockMapBatchUploadingController.handleFileUpload}"
+                                  value="#{agentAndStockMapBatchUploadingController.uploadedFile}"
+                                  mode="advanced" dragDropSupport="false"
+                                  update="importAgentStockMapFileFieldId"
+                                  sizeLimit="1000000"
+                                  allowTypes="/(\.|\/)(txt)$/"
+                                  auto="true"
+                                  label="Chọn file" styleClass="fileUpload-onebutton">
+                    </p:fileUpload>
+                  </p:panelGrid>
+
+                  <p:panelGrid columns="2" styleClass="resultGrid" style="margin-bottom:20px;margin-top:20px">
+                    <p:commandButton value="Gửi đi" styleClass="commonButton"
+                                     onclick="PF('blockEntirePage').show()" oncomplete="PF('blockEntirePage').hide()"
+                                     actionListener="#{agentAndStockMapBatchUploadingController.doUploadAgentStockMapBatch}"
+                                     validateClient="true"
+                                     update="importAgentStockMapFileFieldId"/>
+                    <p:commandButton value="Download file lỗi"
+                                     styleClass="commonButton"
+                                     disabled="#{not agentAndStockMapBatchUploadingController.uploadedFileError}"
+                                     actionListener="#{agentAndStockMapBatchUploadingController.handleErrorFileDownload}"
+                                     ajax="false"
+                                     update="importAgentStockMapFileFieldId">
+                      <p:fileDownload value="#{agentAndStockMapBatchUploadingController.errorFile}"/>
+                    </p:commandButton>
+                  </p:panelGrid>
+
+                </p:fieldset>
+              </h:form>
+            </p:panel>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </ui:define>
+
+</ui:composition>
+

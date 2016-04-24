@@ -1,0 +1,137 @@
+<ui:composition template="/include/etopup/layout-etopup-quantridaily.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+
+  <ui:define name="lib-header">
+  </ui:define>
+  <ui:define name="content">
+    <h:form id="agentBatchUploadingForm" enctype="multipart/form-data">
+      <p:hotkey bind="f9"/>
+      <p:growl id="growl" showDetail="true" autoUpdate="true" globalOnly="true"/>
+      <table style="width: 100%; height: 100%">
+        <tbody>
+        <tr>
+          <td class="menu-left"><ui:insert>
+            <ui:include src="/include/etopup/menu-top-left-etopup-quantridaily.xhtml"/>
+          </ui:insert></td>
+          <td class="wr-main">
+            <div class="main">
+              <div class="top-bar-content">
+                <div class="origin">
+                  <a href="#{request.contextPath}/home/index.xhtml">Trang chủ</a>&#187;
+                  <a class="here">Quản trị đại lý</a>&#187;
+                  <a class="here">Upload đại lý theo lô</a>
+                </div>
+              </div>
+              <p:panel styleClass="main-panel-content">
+                <p:fieldset id="searchAgentFieldSetId" legend="Tìm kiếm" styleClass="searchFieldSet">
+                  <p:focus context="searchAgentFieldSetId"/>
+                  <p:panelGrid columns="5" styleClass="searchCriteriaGrid">
+                    <p:outputLabel value="Số thuê bao"/>
+                    <p:inputText id="phoneNumber"
+                                 value="#{agentBatchUploadingEtopupController.agentBatchUploadingDTO.phoneNumer}"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Tên đại lý"/>
+                    <p:inputText id="agentName"
+                                 value="#{agentBatchUploadingEtopupController.agentBatchUploadingDTO.agentName}"/>
+
+                    <p:outputLabel value="Từ ngày"/>
+                    <p:calendar id="startDate"
+                                showButtonPanel="true"
+                                navigator="true"
+                                value="#{agentBatchUploadingEtopupController.agentBatchUploadingDTO.startDate}"
+                                mode="popup"
+                                pattern="dd/MM/yyyy"
+                                placeholder="Click để chọn ngày..."/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Đến ngày"/>
+                    <p:calendar id="endDate"
+                                showButtonPanel="true"
+                                navigator="true"
+                                value="#{agentBatchUploadingEtopupController.agentBatchUploadingDTO.endDate}"
+                                mode="popup"
+                                pattern="dd/MM/yyyy"
+                                placeholder="Click để chọn ngày..."/>
+                  </p:panelGrid>
+                  <p:panelGrid columns="1" styleClass="searchCriteriaGrid">
+                    <p:commandButton id="searchAgentBtn"
+                                     value="Tìm"
+                                     styleClass="commonButton"
+                                     onclick="PF('blockEntirePage').show()"
+                                     oncomplete="PF('blockEntirePage').hide()"
+                                     update="agentDataTableId :agentBatchUploadingForm:growl"
+                                     actionListener="#{agentBatchUploadingEtopupController.doFindAgents}"/>
+                  </p:panelGrid>
+                </p:fieldset>
+
+                <p:fieldset styleClass="resultFieldSet" style="border: none">
+                  <p:dataTable styleClass="table-list ft-left resultDataTable"
+                               id="agentDataTableId"
+                               paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                               paginator="true"
+                               rows="15"
+                               lazy="true"
+                               paginatorPosition="bottom"
+                               resizableColumns="true"
+                               selectionMode="single"
+                               value="#{agentBatchUploadingEtopupController.agentBatchUploadingLazyDataModel}"
+                               var="agent"
+                               emptyMessage="Không tìm thấy kết quả tìm kiếm">
+                    <p:column headerText="Số thuê bao" style="width:120px">
+                      <p:outputLabel value="#{agent.msisdn}"/>
+                    </p:column>
+                    <p:column headerText="Tên đại lý">
+                      <p:outputLabel value="#{agent.tradeName}"/>
+                    </p:column>
+                    <p:column headerText="Ngày tạo" style="width:100px">
+                      <p:outputLabel value="#{agent.createDate}"><f:convertDateTime pattern="dd/MM/yyyy"/></p:outputLabel>
+                    </p:column>
+                    <p:column headerText="Ngày thay đổi cuối" style="width:120px">
+                      <p:outputLabel value="#{agent.lastModified}"><f:convertDateTime pattern="dd/MM/yyyy"/></p:outputLabel>
+                    </p:column>
+                    <p:column headerText="Trạng thái" style="width:100px">
+                      <p:outputLabel value="#{agent.statusEnum.name}"/>
+                    </p:column>
+                  </p:dataTable>
+                </p:fieldset>
+
+                <p:fieldset id="importAgentFileFieldSetId" legend="Nhập từ file" styleClass="searchFieldSet">
+                  <p:panelGrid columns="4" styleClass="searchCriteriaGrid">
+                    <p:outputLabel value="Tên file">
+                      <span class="red-star" style="margin: 0">*</span>
+                    </p:outputLabel>
+                    <p:inputText readonly="true" styleClass="search-list-popup" style="width:300px"
+                                 id="agentBatchUploadedFileName"
+                                 value="#{agentBatchUploadingEtopupController.agentBatchUploadingDTO.agentUploadedFileName}" />
+                    <p:fileUpload fileUploadListener="#{agentBatchUploadingEtopupController.handleFileUpload}"
+                                  mode="advanced" dragDropSupport="false"
+                                  update="agentBatchUploadedFileName downloadErrorFileBtn"
+                                  sizeLimit="1000000"  auto="true" label="Chọn file" styleClass="fileUpload-onebutton"/>
+                  </p:panelGrid>
+                  <p:panelGrid columns="2" styleClass="searchCriteriaGrid">
+                    <p:commandButton value="Gửi đi" styleClass="commonButton" style="margin-top:10px"
+                                     actionListener="#{agentBatchUploadingEtopupController.doUploadAgentBatch}"
+                                     update="agentBatchUploadedFileName downloadErrorFileBtn"/>
+
+                    <p:commandButton id="downloadErrorFileBtn" value="Download file lỗi" styleClass="commonButton" style="margin-top:10px"
+                                     onclick="PF('downloadErrorFile').show()"
+                                     disabled="#{!agentBatchUploadingEtopupController.uploadedFileError}"
+                                     ajax="false">
+                      <p:fileDownload value="#{agentBatchUploadingEtopupController.errorFile}" oncomplete="PF('downloadErrorFile').hide()"/>
+                    </p:commandButton>
+                  </p:panelGrid>
+                </p:fieldset>
+              </p:panel>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </h:form>
+  </ui:define>
+
+</ui:composition>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core">
+
+<h:head>
+	<meta charset="utf-8"></meta>
+	<link rel="shortcut icon"
+		href="#{request.contextPath}/content/images/favicon.png" />
+
+	<title>CMS</title>
+	<link rel="stylesheet" type="text/css"
+		href="#{request.contextPath}/content/css/reset.css" />
+	<link rel="stylesheet" type="text/css"
+		href="#{request.contextPath}/content/css/style.css" />
+
+</h:head>
+
+<h:body>
+	<div class="logo-home-block"
+		style="right: 15px !important; left: inherit">
+		<h1>CMS</h1>
+	</div>
+
+	<div class="error_404_box">
+		<ui:insert name="contentTitle"></ui:insert>
+		<ui:insert name="content">
+		</ui:insert>
+	</div>
+</h:body>
+</html>

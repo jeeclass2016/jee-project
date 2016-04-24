@@ -1,0 +1,39 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:pt="http://java.sun.com/jsf/passthrough">
+  <h:form>
+    <a href="#{request.contextPath}" class="menu-top1">Trang chủ</a>
+    <a href="#{request.contextPath}/etopup/danh-muc/DanhMucTrungTam.xhtml"
+      class="menu-top1">Services</a>
+    <div class="ft-right"></div>
+    <script type="text/javascript">
+    window.onload = function(){
+    	var pathname = window.location.pathname;
+      if (pathname.indexOf('catalog') >= 0){
+    	  $(".menu-top1").removeClass('selected');
+    	   $('.catelog').addClass('selected');
+        }
+    
+      if (pathname.indexOf('stock') >= 0){
+        $(".menu-top1").removeClass('selected');
+         $('.stock').addClass('selected');
+        }
+      
+
+      if (pathname.indexOf('sale') >= 0){
+        $(".menu-top1").removeClass('selected');
+         $('.sale').addClass('selected');
+        }
+      
+
+      if (pathname.indexOf('invoice') >= 0){
+          $(".menu-top1").removeClass('selected');
+           $('.hoadon').addClass('selected');
+          }
+        }
+      
+    </script>
+  </h:form>
+</ui:composition>

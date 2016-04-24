@@ -1,0 +1,18 @@
+<ui:composition template="/include/error_layout.html" xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:p="http://primefaces.org/ui">
+  <ui:define name="contentTitle">
+    <h1>
+      <b>whoops !!!</b>
+    </h1>
+    <h2>
+      <b>The page you are trying to access seems to no longer exists. <br/>Please click links below to start over.</b>
+    </h2>
+    <div class="error_button">
+      <a href="#{request.contextPath}" class="btn" style="margin-right: 10px">Back to home page</a>
+    </div>
+    <img width="382" height="264" src="#{request.contextPath}/content/images/error_404.png" />
+  </ui:define>
+</ui:composition>

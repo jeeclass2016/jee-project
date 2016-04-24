@@ -1,0 +1,463 @@
+<ui:composition template="/include/etopup/layout-etopup-quantridaily.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui">
+
+  <f:metadata>
+    <f:event type="preRenderView" listener="#{agentManagementController.initForOpeningPage}"/>
+  </f:metadata>
+
+  <ui:define name="lib-header">
+  </ui:define>
+  <ui:define name="content">
+    <p:growl id="growl" showDetail="true" autoUpdate="true" globalOnly="true"/>
+    <table style="width: 100%; height: 100%">
+      <tbody>
+      <tr>
+        <td class="menu-left"><ui:insert>
+          <ui:include src="/include/etopup/menu-top-left-etopup-quantridaily.xhtml"/>
+        </ui:insert></td>
+        <td class="wr-main">
+          <div class="main">
+            <div class="top-bar-content">
+              <div class="origin">
+                <a href="#{request.contextPath}/home/index.xhtml">Trang chủ</a>&#187;
+                <a class="here">Quản trị đại lý</a>&#187;
+                <a class="here">Quản trị đại lý</a>
+              </div>
+            </div>
+            <p:panel styleClass="main-panel-content">
+              <h:form id="searchAgentManagementForm">
+                <p:fieldset id="searchAgentFieldSetId" legend="Tìm kiếm" styleClass="searchFieldSet">
+                  <p:focus context="searchAgentFieldSetId"/>
+                  <p:hotkey bind="f9"/>
+                  <p:panelGrid columns="3" style="margin-bottom:20px" styleClass="searchCriteriaGrid"
+                               columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label">
+                    <p:outputLabel value="Số thuê bao">
+                      <p:outputLabel value="*" styleClass="red-star"/>
+                    </p:outputLabel>
+                    <p:inputText id="msisdn" label="Số thuê bao" value="#{agentManagementController.agentDTO.msisdn}"
+                                 style="width:300px" required="true">
+                      <o:validator validatorId="requiredContentValidator"/>
+                      <f:validator validatorId="phoneValidator"/>
+                    </p:inputText>
+                    <p:commandButton id="searchAgentBtn" value="Tìm kiếm" styleClass="commonButton"
+                                     onclick="PF('blockEntirePage').show()" oncomplete="PF('blockEntirePage').hide()"
+                                     validateClient="true"
+                                     update="searchAgentFieldSetId, :agentManagementInfoForm:agentInfoFieldSet, :agentManagementInfoForm:subAgentsInfoFieldSet"
+                                     actionListener="#{agentManagementController.doFindAgent}">
+                      <p:resetInput target=":agentManagementInfoForm:agentInfoFieldSet"/>
+                    </p:commandButton>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message id="messageForMsisdn" for="msisdn"/>
+                  </p:panelGrid>
+                </p:fieldset>
+              </h:form>
+
+              <h:form id="agentManagementInfoForm">
+                <p:fieldset id="agentInfoFieldSet" legend="Thông tin thuê bao" styleClass="resultFieldSet">
+                  <p:panelGrid columns="5" styleClass="resultGrid"
+                               columnClasses="resultGrid-label, resultGrid-input, resultGrid-label, resultGrid-label, resultGrid-input">
+                    <p:outputLabel value="Số thuê bao"><p:outputLabel value="*" styleClass="red-star"/></p:outputLabel>
+                    <p:inputText id="msisdnInfo" value="#{agentManagementController.agent.msisdn}"
+                                 styleClass="commonInputText"
+                                 disabled="#{agentManagementController.enableEditing}"
+                                 label="Số thuê bao" required="true">
+                      <o:validator validatorId="requiredContentValidator"/>
+                      <o:validator validatorId="phoneValidator"/>
+                    </p:inputText>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Số ICCID"><p:outputLabel value="*" styleClass="red-star"/></p:outputLabel>
+                    <p:inputText id="iccidInfo" value="#{agentManagementController.agent.iccid}"
+                                 styleClass="commonInputText"
+                                 disabled="#{agentManagementController.enableEditing}"
+                                 required="true" label="Số ICCID">
+                      <o:validator validatorId="numberValidator"/>
+                      <f:validateLength minimum="19" maximum="20"/>
+                    </p:inputText>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="msisdnInfo"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="iccidInfo"/>
+
+                    <p:outputLabel value="Tên thương mại"> <p:outputLabel value="*" styleClass="red-star"/>
+                    </p:outputLabel>
+                    <p:inputText id="tradeNameInfo" value="#{agentManagementController.agent.tradeName}"
+                                 styleClass="commonInputText"
+                                 required="true" label="Tên thương mại">
+                      <o:validator validatorId="requiredContentValidator"/>
+                      <f:validateLength maximum="100"/>
+                    </p:inputText>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Tên chủ sở hữu"> <p:outputLabel value="*" styleClass="red-star"/>
+                    </p:outputLabel>
+                    <p:inputText id="ownerNameInfo" value="#{agentManagementController.agent.ownerName}"
+                                 styleClass="commonInputText"
+                                 required="true" label="Tên chủ sở hữu">
+                      <o:validator validatorId="requiredContentValidator"/>
+                      <f:validateLength maximum="100"/>
+                    </p:inputText>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="tradeNameInfo"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="ownerNameInfo"/>
+
+                    <p:outputLabel value="Mã đại lý"><p:outputLabel value="*" styleClass="red-star"/> </p:outputLabel>
+                    <p:inputText id="sapCodeInfo" value="#{agentManagementController.agent.sapCode}"
+                                 styleClass="commonInputText"
+                                 required="true" label="Mã đại lý">
+                      <o:validator validatorId="nameValidator"/>
+                      <f:validateLength maximum="20"/>
+                    </p:inputText>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Trung tâm"><p:outputLabel value="*" styleClass="red-star"/></p:outputLabel>
+                    <p:selectOneMenu id="centreInfo" required="true" label="Trung tâm"
+                                     value="#{agentManagementController.agent.centreId}">
+                      <f:selectItem itemLabel="" itemValue="" itemDisabled="true"/>
+                      <f:selectItems value="#{agentManagementController.centreSelectItems}"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="sapCodeInfo"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="centreInfo"/>
+
+
+                    <p:outputLabel value="Ngày tạo"><p:outputLabel value="*" styleClass="red-star"/></p:outputLabel>
+                    <p:calendar id="createDateInfo" label="Ngày tạo" maxdate="createDateWidget.today()"
+                                widgetVar="createDateWidget"
+                                showButtonPanel="true" navigator="true" required="true"
+                                value="#{agentManagementController.agent.createDate}" mode="popup" pattern="dd/MM/yyyy"
+                                converter="customDateTimeConverter"
+                                placeholder="Click để chọn ngày...">
+                      <f:convertDateTime pattern="dd/MM/yyyy" timeZone="#{agentManagementController.currentTimeZone}"/>
+                    </p:calendar>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Ngày thay đổi">
+                      <p:outputLabel value="*" styleClass="red-star"/>
+                    </p:outputLabel>
+                    <p:calendar id="changeDateInfo" label="Ngày thay đổi" showButtonPanel="true" navigator="true"
+                                required="true"
+                                value="#{agentManagementController.agent.lastModified}" mode="popup"
+                                pattern="dd/MM/yyyy"
+                                converter="customDateTimeConverter"
+                                placeholder="Click để chọn ngày...">
+                      <f:convertDateTime pattern="dd/MM/yyyy" timeZone="#{agentManagementController.currentTimeZone}"/>
+                    </p:calendar>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="createDateInfo"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:panel styleClass="groupPanel">
+                      <p:message for="changeDateInfo"/>
+                      <o:validateOrder type="lte"
+                                       components="createDateInfo changeDateInfo"
+                                       message="Ngày thay đổi không được trước Ngày tạo"
+                                       showMessageFor="changeDateInfo"/>
+                    </p:panel>
+
+                    <p:outputLabel value="Ngày mật khẩu hết hạn">
+                      <p:outputLabel value="*" styleClass="red-star"/>
+                    </p:outputLabel>
+                    <p:calendar id="mpinExpireDateInfo" label="Ngày mật khẩu hết hạn" showButtonPanel="true"
+                                navigator="true"
+                                required="true" value="#{agentManagementController.agent.mpinExpireDate}" mode="popup"
+                                pattern="dd/MM/yyyy"
+                                converter="customDateTimeConverter"
+                                placeholder="Click để chọn ngày...">
+                      <f:convertDateTime pattern="dd/MM/yyyy" timeZone="#{agentManagementController.currentTimeZone}"/>
+                    </p:calendar>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Số lần đăng nhập sai">
+                      <p:outputLabel value="*" styleClass="red-star"/>
+                    </p:outputLabel>
+                    <p:inputText value="#{agentManagementController.agent.loginFailureCount}"
+                                 id="loginFailureCountInfo"
+                                 styleClass="commonInputText" required="true" label="Số lần đăng nhập sai">
+                      <o:validator validatorId="numberValidator"/>
+                      <f:validateLength maximum="10"/>
+                    </p:inputText>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:panel styleClass="groupPanel">
+                      <p:message for="mpinExpireDateInfo"/>
+                      <o:validateOrder type="lte"
+                                       components="createDateInfo mpinExpireDateInfo"
+                                       message="Ngày mật khẩu hết hạn không được trước Ngày tạo"
+                                       showMessageFor="mpinExpireDateInfo"/>
+                    </p:panel>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="loginFailureCountInfo"/>
+
+                    <p:outputLabel value="Trạng thái"><p:outputLabel value="*" styleClass="red-star"/></p:outputLabel>
+                    <p:selectOneMenu id="statusInfo" required="true" label="Trạng thái"
+                                     value="#{agentManagementController.agent.status}">
+                      <p:ajax event="change" update="buttonsGridId"
+                              listener="#{agentManagementController.onChangeStatus}"/>
+                      <f:selectItem itemLabel="" itemValue="" itemDisabled="true"/>
+                      <f:selectItems value="#{agentManagementController.agentStatusSelectItems}"/>
+                    </p:selectOneMenu>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Ngày sinh"/>
+                    <p:calendar id="birthDateInfo" label="Ngày sinh" showButtonPanel="true" navigator="true"
+                                widgetVar="birthDateWidget"
+                                maxdate="birthDateWidget.today()"
+                                value="#{agentManagementController.agent.birthDate}" mode="popup" pattern="dd/MM/yyyy"
+                                converter="customDateTimeConverter"
+                                placeholder="Click để chọn ngày...">
+                      <f:convertDateTime pattern="dd/MM/yyyy" timeZone="#{agentManagementController.currentTimeZone}"/>
+                    </p:calendar>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="statusInfo"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="birthDateInfo"/>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:selectBooleanCheckbox value="#{agentManagementController.agent.receiveReportByMail}"
+                                             itemLabel="Nhận báo cáo qua email"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Email"/>
+                    <p:inputText id="emailInfo" label="Email" value="#{agentManagementController.agent.email}"
+                                 styleClass="commonInputText">
+                      <f:validator validatorId="emailValidator"/>
+                    </p:inputText>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="emailInfo"/>
+
+                    <p:outputLabel value="Tỉnh"/>
+                    <p:selectOneMenu id="provinceInfo" label="Tỉnh" style="width:150px"
+                                     value="#{agentManagementController.agent.province}">
+                      <p:ajax event="change"
+                              listener="#{agentManagementController.onProvinceChange}"
+                              update="districtInfo regionInfo"/>
+                      <f:selectItem itemLabel="" itemValue=""/>
+                      <f:selectItems value="#{agentManagementController.provinceSelectItems}"/>
+                    </p:selectOneMenu>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Huyện"/>
+                    <p:selectOneMenu id="districtInfo" label="Huyện" style="width:150px"
+                                     value="#{agentManagementController.agent.district}">
+                      <f:selectItem itemLabel="" itemValue=""/>
+                      <f:selectItems value="#{agentManagementController.districtSelectItems}"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel value="Vùng"/>
+                    <p:selectOneMenu id="regionInfo" label="Vùng" style="width:150px" disabled="true"
+                                     value="#{agentManagementController.region}">
+                      <f:selectItems value="#{agentManagementController.regionSelectItems}"/>
+                    </p:selectOneMenu>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Địa chỉ"/>
+                    <p:inputText id="outletAddressInfo" value="#{agentManagementController.agent.outletAddress}"
+                                 styleClass="commonInputText">
+                      <f:validateLength maximum="200"/>
+                    </p:inputText>
+
+                    <p:outputLabel value="Số liên lạc"/>
+                    <p:inputText id="contactNoInfo"
+                                 value="#{agentManagementController.agent.contactNo}" styleClass="commonInputText">
+                      <o:validator validatorId="numberValidator"/>
+                    </p:inputText>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Loại đại lý"/>
+                    <p:selectOneMenu id="agentTypeInfo" label="Huyện" value="#{agentManagementController.agent.type}">
+                      <f:selectItem itemLabel="" itemValue=""/>
+                      <f:selectItems value="#{agentManagementController.agentTypeSelectItems}"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="contactNoInfo"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="agentTypeInfo"/>
+
+                    <p:outputLabel value="Mã số thuế"/>
+                    <p:inputText id="tinInfo"
+                                 label="Mã số thuế"
+                                 value="#{agentManagementController.agent.tin}"
+                                 styleClass="commonInputText">
+                      <f:validateLength maximum="20"/>
+                    </p:inputText>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="CMT"><p:outputLabel value="*" styleClass="red-star"/></p:outputLabel>
+                    <p:inputText value="#{agentManagementController.agent.idNo}" label="CMT" id="idNoInfo"
+                                 required="true"
+                                 styleClass="commonInputText">
+                      <o:validator validatorId="requiredContentValidator"/>
+                      <o:validator validatorId="numberValidator"/>
+                      <f:validateLength maximum="20"/>
+                    </p:inputText>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="tinInfo"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="idNoInfo"/>
+
+                    <p:outputLabel value="Nơi cấp"><p:outputLabel value="*" styleClass="red-star"/></p:outputLabel>
+                    <p:inputText value="#{agentManagementController.agent.placeIssue}" styleClass="commonInputText"
+                                 id="placeIssueInfo"
+                                 required="true" label="Nơi cấp">
+                      <o:validator validatorId="requiredContentValidator"/>
+                      <f:validateLength maximum="200"/>
+                    </p:inputText>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Ngày cấp"><p:outputLabel value="*" styleClass="red-star"/></p:outputLabel>
+                    <p:calendar label="Ngày cấp" id="dateIssueInfo" showButtonPanel="true" styleClass="commonInputText"
+                                navigator="true"
+                                required="true" value="#{agentManagementController.agent.dateIssue}" mode="popup"
+                                pattern="dd/MM/yyyy"
+                                converter="customDateTimeConverter"
+                                widgetVar="dateIssueWidget"
+                                maxdate="dateIssueWidget.today()"
+                                placeholder="Click để chọn ngày...">
+                      <f:convertDateTime pattern="dd/MM/yyyy" timeZone="#{agentManagementController.currentTimeZone}"/>
+                    </p:calendar>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="placeIssueInfo"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="dateIssueInfo"/>
+
+                    <p:outputLabel value="Câu hỏi bí mật"/>
+                    <p:inputText id="secureQuestionInfo"
+                                 value="#{agentManagementController.agent.secureQuestion}"
+                                 styleClass="commonInputText">
+                      <f:validateLength maximum="100"/>
+                    </p:inputText>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Lí do"/>
+                    <p:inputText value="#{agentManagementController.agent.reason}" styleClass="commonInputText"/>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="secureQuestionInfo"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+
+                  </p:panelGrid>
+
+                  <p:panelGrid columns="2" styleClass="resultGrid"
+                               columnClasses="resultGrid-label, resultGrid-input">
+                    <p:outputLabel value="Đại lý cấp trên">
+                      <p:outputLabel value="*" styleClass="red-star"/>
+                    </p:outputLabel>
+                    <p:panel styleClass="groupPanel">
+                      <p:autoComplete id="parentMSISDNInfo"
+                                      label="Số thuê bao đại lý cấp trên"
+                                      required="true"
+                                      scrollHeight="300"
+                                      value="#{agentManagementController.parentAgent.msisdn}"
+                                      completeMethod="#{agentManagementController.completeParentMSISDN}">
+                        <p:ajax event="itemSelect" listener="#{agentManagementController.handleSelectParentAgentMsisdn}"
+                                update="parentTradeNameInfo"/>
+                      </p:autoComplete>
+                      <p:inputText id="parentTradeNameInfo"
+                                   style="margin-left:10px; width:350px"
+                                   disabled="true"
+                                   value="#{agentManagementController.parentAgent.tradeName}"/>
+                    </p:panel>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="parentMSISDNInfo"/>
+                  </p:panelGrid>
+
+                  <p:panelGrid columns="3" styleClass="resultGrid" style="margin-bottom: 10px" id="buttonsGridId">
+                    <p:commandButton id="addBtn" value="Thêm" styleClass="commonButton" validateClient="true"
+                                     disabled="#{not agentManagementController.enableAdding}"
+                                     update=":agentManagementInfoForm:agentInfoFieldSet, :agentManagementInfoForm:subAgentsInfoFieldSet"
+                                     onclick="PF('blockEntirePage').show()" oncomplete="PF('blockEntirePage').hide()"
+                                     actionListener="#{agentManagementController.doAddAgent}">
+                      <p:resetInput target=":agentManagementInfoForm:agentInfoFieldSet"/>
+                    </p:commandButton>
+
+                    <p:commandButton value="Sửa" styleClass="commonButton" validateClient="true"
+                                     rendered="#{agentManagementController.enableConfirmEditing}"
+                                     disabled="#{not agentManagementController.enableEditing}"
+                                     update=":agentManagementInfoForm:agentInfoFieldSet, :agentManagementInfoForm:subAgentsInfoFieldSet"
+                                     onclick="PF('blockEntirePage').show()" oncomplete="PF('blockEntirePage').hide()"
+                                     actionListener="#{agentManagementController.doChangeAgent}">
+                      <p:resetInput target=":agentManagementInfoForm:agentInfoFieldSet"/>
+                      <p:confirm header="Xác nhận" message="Bạn có chắc chắn muốn sửa đại lý này không?"
+                                 icon="ui-icon-alert"/>
+                    </p:commandButton>
+
+                    <p:commandButton value="Sửa" styleClass="commonButton" validateClient="true"
+                                     rendered="#{not agentManagementController.enableConfirmEditing}"
+                                     disabled="#{not agentManagementController.enableEditing}"
+                                     update=":agentManagementInfoForm:agentInfoFieldSet, :agentManagementInfoForm:subAgentsInfoFieldSet"
+                                     onclick="PF('blockEntirePage').show()" oncomplete="PF('blockEntirePage').hide()"
+                                     actionListener="#{agentManagementController.doChangeAgent}">
+                      <p:resetInput target=":agentManagementInfoForm:agentInfoFieldSet"/>
+                    </p:commandButton>
+
+                    <p:commandButton id="deleteBtn" value="Hủy thuê bao" styleClass="commonButton" immediate="true"
+                                     disabled="#{not agentManagementController.enableDeleting}"
+                                     update=":agentManagementInfoForm:agentInfoFieldSet, :agentManagementInfoForm:subAgentsInfoFieldSet"
+                                     onclick="PF('blockEntirePage').show()" oncomplete="PF('blockEntirePage').hide()"
+                                     actionListener="#{agentManagementController.doDeleteAgent}">
+                      <p:resetInput target=":agentManagementInfoForm:agentInfoFieldSet"/>
+                      <p:confirm header="Xác nhận" message="Bạn có chắc chắn muốn hủy đại lý này không?"
+                                 icon="ui-icon-alert"/>
+                    </p:commandButton>
+                  </p:panelGrid>
+                </p:fieldset>
+                <p:fieldset id="subAgentsInfoFieldSet" legend="Danh sách đại lý trực thuộc" styleClass="resultFieldSet">
+                  <p:dataTable styleClass="table-list ft-left resultDataTable"
+                               paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                               paginator="true"
+                               rows="15"
+                               rowKey="#{subAgent.agentId}"
+                               paginatorPosition="bottom"
+                               resizableColumns="true"
+                               emptyMessage="Không có đại lý trực thuộc nào"
+                               selectionMode="single"
+                               value="#{agentManagementController.subAgents}"
+                               var="subAgent">
+                    <p:column headerText="Số thuê bao" sortBy="#{subAgent.msisdn}">
+                      <p:outputLabel value="#{subAgent.msisdn}"/>
+                    </p:column>
+                    <p:column headerText="Số ICCID" sortBy="#{subAgent.iccid}">
+                      <p:outputLabel value="#{subAgent.iccid}"/>
+                    </p:column>
+                    <p:column headerText="Tên thương mại">
+                      <p:outputLabel value="#{subAgent.tradeName}"/>
+                    </p:column>
+                    <p:column headerText="Tên chủ sở hữu">
+                      <p:outputLabel value="#{subAgent.ownerName}"/>
+                    </p:column>
+                    <p:column headerText="Ngày sinh" style="width:250px">
+                      <p:outputLabel value="#{subAgent.birthDate}">
+                        <f:convertDateTime pattern="dd/MM/yyyy"
+                                           timeZone="#{agentManagementController.currentTimeZone}"/>
+                      </p:outputLabel>
+                    </p:column>
+                    <p:column headerText="Số phone liên lạc">
+                      <p:outputLabel value="#{subAgent.contactNo}"/>
+                    </p:column>
+                  </p:dataTable>
+                </p:fieldset>
+              </h:form>
+            </p:panel>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+  </ui:define>
+</ui:composition>
+

@@ -1,0 +1,429 @@
+<ui:composition template="/include/etopup/layout-etopup-danhmuc.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui">
+
+
+  <ui:define name="lib-header">
+  </ui:define>
+
+  <ui:define name="content">
+    <p:growl id="growl" showDetail="true" autoUpdate="true" globalOnly="true"/>
+    <table style="width: 100%; height: 100%">
+      <tbody>
+      <tr>
+        <td class="menu-left"><ui:insert>
+          <ui:include src="/include/etopup/menu-top-left-etopup-danhmuc.xhtml"/>
+        </ui:insert></td>
+        <td class="wr-main">
+          <div class="main">
+
+            <div class="top-bar-content">
+              <div class="origin">
+                <a href="#{request.contextPath}/home/index.xhtml">Trang chủ</a>&#187;
+                <a class="here">Danh mục</a>&#187;
+                <a class="here">Map đại lý và kho</a>
+              </div>
+            </div>
+
+            <p:panel styleClass="main-panel-content">
+              <h:form id="searchAgentForm">
+                <p:fieldset id="searchAgentFieldSetId" legend="Tìm kiếm đại lý" styleClass="searchFieldSet">
+                  <p:focus context="searchAgentFieldSetId"/>
+
+                  <p:panelGrid columns="3" style="margin-bottom:20px" styleClass="searchCriteriaGrid"
+                               columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label">
+                    <p:outputLabel value="Số thuê bao">
+                      <p:outputLabel value="*" styleClass="red-star"/>
+                    </p:outputLabel>
+                    <p:inputText id="msisdn" label="Số thuê bao" value="#{agentAndStockMapController.agentDTO.msisdn}"
+                                 style="width:300px" required="true">
+                      <o:validator validatorId="requiredContentValidator"/>
+                      <f:validator validatorId="phoneValidator"/>
+                    </p:inputText>
+                    <p:commandButton id="searchAgentBtn" value="Tìm đại lý" styleClass="commonButton"
+                                     onclick="PF('blockEntirePage').show()" oncomplete="PF('blockEntirePage').hide()"
+                                     validateClient="true"
+                                     update="searchAgentFieldSetId :searchStockForm:searchStockFieldSetId
+                                            :activateTimeForm:searchActivateTimeFieldSetId
+                                            :agentAndStockListForm:agentAndStockListFieldSetId"
+                                     actionListener="#{agentAndStockMapController.doFindAgent}">
+                      <p:resetInput target=" :activateTimeForm:searchActivateTimeFieldSetId"/>
+                      <p:resetInput target=":searchStockForm:searchStockFieldSetId"/>
+                    </p:commandButton>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message id="messageForMsisdn" for="msisdn" escape="false"/>
+                  </p:panelGrid>
+
+                  <p:panelGrid id="agentResultGrid"
+                               columns="4" style="margin-bottom:20px" styleClass="resultGrid"
+                               columnClasses="resultGrid-label, resultGrid-input, resultGrid-label, resultGrid-input">
+                    <p:outputLabel value="Tên đại lý"/>
+                    <p:inputText value="#{agentAndStockMapController.agent.tradeName}"
+                                 styleClass="commonInputText"
+                                 disabled="true"/>
+                    <p:outputLabel value="Địa chỉ"/>
+                    <p:inputText value="#{agentAndStockMapController.agent.outletAddress}"
+                                 styleClass="commonInputText"
+                                 disabled="true"/>
+                  </p:panelGrid>
+                </p:fieldset>
+              </h:form>
+
+              <h:form id="searchStockForm">
+                <p:fieldset id="searchStockFieldSetId" legend="Tìm kiếm kho" styleClass="searchFieldSet">
+                  <p:panelGrid columns="4" style="margin-bottom:20px" styleClass="searchCriteriaGrid"
+                               columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label, searchCriteriaGrid-label">
+
+                    <p:outputLabel value="Cửa hàng"/>
+                    <p:autoComplete value="#{agentAndStockMapController.shopDTO.shopCode}"
+                                    scrollHeight="300"
+                                    styleClass="commonInputText"
+                                    disabled="#{not agentAndStockMapController.enableSearchStock}"
+                                    completeMethod="#{agentAndStockMapController.completeShopCodeForMain}">
+                      <p:ajax event="itemSelect"
+                              listener="#{agentAndStockMapController.handleSelecteShopCodeForMain}"
+                              update="shopNameInfo staffAutoComplete staffNameInfo stockIdInfoPanel :activateTimeForm:searchActivateTimeFieldSetId"/>
+                      <p:ajax event="change"
+                              listener="#{agentAndStockMapController.handleSelecteShopCodeForMain}"
+                              update="shopNameInfo staffAutoComplete staffNameInfo stockIdInfoPanel :activateTimeForm:searchActivateTimeFieldSetId"/>
+                    </p:autoComplete>
+                    <p:inputText id="shopNameInfo"
+                                 value="#{agentAndStockMapController.shopDTO.shopName}"
+                                 disabled="true"
+                                 styleClass="commonInputText"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+
+                    <p:outputLabel value="Nhân viên"/>
+                    <p:autoComplete id="staffAutoComplete"
+                                    value="#{agentAndStockMapController.staffDTO.staffCode}"
+                                    styleClass="commonInputText"
+                                    scrollHeight="300"
+                                    disabled="#{not agentAndStockMapController.enableSearchStock}"
+                                    completeMethod="#{agentAndStockMapController.completeStaffCodeForMain}">
+                      <p:ajax event="itemSelect"
+                              listener="#{agentAndStockMapController.handleSelectStaffCodeForMain}"
+                              update="staffNameInfo stockIdInfoPanel :activateTimeForm:searchActivateTimeFieldSetId"/>
+                      <p:ajax event="change"
+                              listener="#{agentAndStockMapController.handleSelectStaffCodeForMain}"
+                              update="staffNameInfo stockIdInfoPanel :activateTimeForm:searchActivateTimeFieldSetId"/>
+                    </p:autoComplete>
+                    <p:inputText id="staffNameInfo"
+                                 value="#{agentAndStockMapController.staffDTO.name}"
+                                 disabled="true"
+                                 styleClass="commonInputText"/>
+                    <p:commandButton id="searchStockBtn" value="Tìm kho" styleClass="commonButton"
+                                     onclick="PF('blockEntirePage').show()" oncomplete="PF('blockEntirePage').hide()"
+                                     validateClient="true"
+                                     disabled="#{not agentAndStockMapController.enableSearchStock}"
+                                     update="searchStockFieldSetId :activateTimeForm:searchActivateTimeFieldSetId
+                                             :agentAndStockListForm:agentAndStockListFieldSetId"
+                                     actionListener="#{agentAndStockMapController.doFindStockForMain}">
+                      <p:resetInput target=":activateTimeForm:searchActivateTimeFieldSetId"/>
+                    </p:commandButton>
+
+                  </p:panelGrid>
+
+                  <p:panelGrid columns="2" style="margin-bottom:20px" styleClass="searchCriteriaGrid"
+                               id="stockIdInfoPanel"
+                               columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input">
+                    <p:outputLabel value="Mã kho ">
+                      <p:outputLabel value="*" style="color:red"/>
+                    </p:outputLabel>
+                    <p:inputText value="#{agentAndStockMapController.stockAgentMapDTO.stockId}"
+                                 disabled="true"
+                                 rendered="#{agentAndStockMapController.stockAgentMapDTO.stockId > 0}"
+                                 styleClass="commonInputText"/>
+                    <p:inputText value="   " disabled="true"
+                                 rendered="#{agentAndStockMapController.stockAgentMapDTO.stockId == null or agentAndStockMapController.stockAgentMapDTO.stockId == 0}"
+                                 styleClass="commonInputText"/>
+                  </p:panelGrid>
+
+                </p:fieldset>
+              </h:form>
+
+              <h:form id="activateTimeForm">
+                <p:fieldset id="searchActivateTimeFieldSetId" legend="Thời gian hiệu lực" styleClass="searchFieldSet">
+                  <p:panelGrid columns="5" style="margin-bottom:20px" styleClass="searchCriteriaGrid"
+                               columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label, searchCriteriaGrid-label, searchCriteriaGrid-input">
+                    <p:outputLabel value="Ngày bắt đầu ">
+                      <p:outputLabel value="*" style="color:red"/>
+                    </p:outputLabel>
+                    <p:calendar id="newCreateDate"
+                                label="Ngày bắt đầu"
+                                disabled="#{not agentAndStockMapController.enableCreateMap}"
+                                value="#{agentAndStockMapController.stockAgentMapDTO.createDate}"
+                                showButtonPanel="true"
+                                navigator="true"
+                                required="true"
+                                mode="popup"
+                                pattern="dd/MM/yyyy"
+                                converter="customDateTimeConverter"
+                                placeholder="Click để chọn ngày..."/>
+                    <p:outputLabel styleClass="emptySeperatorLabel" style="width:10px"/>
+                    <p:outputLabel value="Ngày kết thúc "/>
+                    <p:calendar id="newEndDate"
+                                label="Ngày kết thúc"
+                                disabled="#{not agentAndStockMapController.enableCreateMap}"
+                                value="#{agentAndStockMapController.stockAgentMapDTO.endDate}"
+                                widgetVar="newEndDateWidget"
+                                mindate="newEndDateWidget.today()"
+                                showButtonPanel="true"
+                                navigator="true"
+                                mode="popup"
+                                pattern="dd/MM/yyyy"
+                                converter="customDateTimeConverter"
+                                placeholder="Click để chọn ngày..."/>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="newCreateDate"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="newEndDate" id="newEndDateMessage"/>
+
+                    <p:outputLabel value="Trạng thái ">
+                      <p:outputLabel value="*" style="color:red"/>
+                    </p:outputLabel>
+                    <p:selectOneMenu id="statusInfo" required="true" label="Trạng thái" style="width:170px"
+                                     disabled="#{not agentAndStockMapController.enableCreateMap}"
+                                     value="#{agentAndStockMapController.stockAgentMapDTO.status}">
+                      <f:selectItem itemLabel="" itemValue=""/>
+                      <f:selectItems value="#{agentAndStockMapController.statusSelectItems}"/>
+                    </p:selectOneMenu>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="statusInfo"/>
+                  </p:panelGrid>
+                  <p:panelGrid columns="1" styleClass="searchCriteriaGrid" style="margin-top:20px">
+                    <p:commandButton id="createMapId" value="Chấp nhận" styleClass="commonButton"
+                                     onclick="PF('blockEntirePage').show()" oncomplete="PF('blockEntirePage').hide()"
+                                     disabled="#{not agentAndStockMapController.enableCreateMap}"
+                                     validateClient="true"
+                                     actionListener="#{agentAndStockMapController.doCreateMap}"
+                                     update="createMapId activateTimeForm:searchActivateTimeFieldSetId :agentAndStockListForm:agentAndStockListFieldSetId">
+                    </p:commandButton>
+                  </p:panelGrid>
+                </p:fieldset>
+              </h:form>
+            </p:panel>
+
+            <h:form id="agentAndStockListForm">
+              <p:fieldset id="agentAndStockListFieldSetId" legend="Danh sách đại lý và kho" styleClass="resultFieldSet">
+                <p:dataTable styleClass="table-list ft-left resultDataTable"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             paginator="true"
+                             rows="15"
+                             emptyMessage="Không có bản ghi nào"
+                             rowKey="#{stockAgentMap.id.stockId}"
+                             lazy="true"
+                             paginatorPosition="bottom"
+                             resizableColumns="true"
+                             selectionMode="single"
+                             value="#{agentAndStockMapController.stockAgentMapLazyDataModel}"
+                             var="stockAgentMap"
+                             widgetVar="dataGridWidget">
+                  <p:column headerText="Số thuê bao" style="width:150px">
+                    <p:outputLabel value="#{agentAndStockMapController.agent.msisdn}"/>
+                  </p:column>
+                  <p:column headerText="Mã kho" sortBy="#{stockAgentMap.id.stockId}">
+                    <p:outputLabel value="#{stockAgentMap.id.stockId}"/>
+                  </p:column>
+
+                  <p:column headerText="Ngày bắt đầu" style="width:150px">
+                    <p:outputLabel value="#{stockAgentMap.createDate}">
+                      <f:convertDateTime pattern="dd/MM/yyyy" timeZone="#{agentAndStockMapController.currentTimeZone}"/>
+                    </p:outputLabel>
+                  </p:column>
+                  <p:column headerText="Ngày kết thúc" style="width:150px">
+                    <p:outputLabel value="#{stockAgentMap.endDate}">
+                      <f:convertDateTime pattern="dd/MM/yyyy" timeZone="#{agentAndStockMapController.currentTimeZone}"/>
+                    </p:outputLabel>
+                  </p:column>
+                  <p:column headerText="Trạng thái">
+                    <p:outputLabel value="Hiệu lực" rendered="#{stockAgentMap.status == 1}"/>
+                    <p:outputLabel value="Hết hiệu lực" rendered="#{stockAgentMap.status == 0}"/>
+                  </p:column>
+                  <p:column style="width:60px">
+                    <p:commandLink title="Chỉnh sửa" styleClass="bt-edit"
+                                   actionListener="#{agentAndStockMapController.onBeforeUpdateStockAgentMap(stockAgentMap)}"
+                                   onsuccess="PF('agentAndStockMapUpdateWidget').show()"
+                                   update=":searchStockFormInUpdate:searchStockFieldSetId :activateTimeFormInUpdateWidget:searchActivateTimeFieldSetId">
+                      <p:resetInput target=":searchStockFormInUpdate"/>
+                      <p:resetInput target=":activateTimeFormInUpdateWidget"/>
+                    </p:commandLink>
+                    <p:commandLink title="Xóa" styleClass="bt-delete-2"
+                                   actionListener="#{agentAndStockMapController.doDelete(stockAgentMap)}"
+                                   update=":agentAndStockListForm:agentAndStockListFieldSetId">
+                      <p:confirm header="Xác nhận" message="Bạn có chắc chắn muốn hủy map đại lý và kho này không?"
+                                 icon="ui-icon-alert"/>
+                    </p:commandLink>
+                  </p:column>
+                </p:dataTable>
+              </p:fieldset>
+            </h:form>
+
+            <p:dialog
+              header="Sửa map đại lý và kho"
+              widgetVar="agentAndStockMapUpdateWidget"
+              resizable="false"
+              id="agentAndStockMapUpdateId"
+              showEffect="fade"
+              modal="true">
+              <h:form id="searchStockFormInUpdate">
+                <p:fieldset id="searchStockFieldSetId" legend="Tìm kiếm kho" styleClass="addFieldSet">
+                  <p:panelGrid columns="4" style="margin-bottom:20px" styleClass="addPanelGrid"
+                               columnClasses="addPanelGrid-label, addPanelGrid-input, addPanelGrid-label, addPanelGrid-label">
+
+                    <p:outputLabel value="Cửa hàng"/>
+                    <p:autoComplete value="#{agentAndStockMapController.editingShopDTO.shopCode}"
+                                    styleClass="commonInputText"
+                                    scrollHeight="300"
+                                    completeMethod="#{agentAndStockMapController.completeShopCodeForEditing}">
+                      <p:ajax event="itemSelect" listener="#{agentAndStockMapController.handleSelectShopCodeForEditing}"
+                              update="editingShopNameInfo editingStaffCodeAutoComplete editingStaffNameInfo"/>
+                      <p:ajax event="change" listener="#{agentAndStockMapController.handleSelectShopCodeForEditing}"
+                              update="editingShopNameInfo editingStaffCodeAutoComplete editingStaffNameInfo"/>
+                    </p:autoComplete>
+                    <p:inputText id="editingShopNameInfo"
+                                 value="#{agentAndStockMapController.editingShopDTO.shopName}"
+                                 disabled="true"
+                                 styleClass="commonInputText"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+
+                    <p:outputLabel value="Nhân viên"/>
+                    <p:autoComplete value="#{agentAndStockMapController.editingStaffDTO.staffCode}"
+                                    id="editingStaffCodeAutoComplete"
+                                    scrollHeight="300"
+                                    forceSelection="true"
+                                    styleClass="commonInputText"
+                                    completeMethod="#{agentAndStockMapController.completeStaffCodeForEditing}">
+                      <p:ajax event="itemSelect" listener="#{agentAndStockMapController.handleSelectEditingStaffCode}"
+                              update="editingStaffNameInfo"/>
+                      <p:ajax event="change" listener="#{agentAndStockMapController.handleSelectEditingStaffCode}"
+                              update="editingStaffNameInfo"/>
+                    </p:autoComplete>
+                    <p:inputText id="editingStaffNameInfo"
+                                 value="#{agentAndStockMapController.editingStaffDTO.name}"
+                                 disabled="true"
+                                 styleClass="commonInputText"/>
+                  </p:panelGrid>
+                  <p:panelGrid columns="1" styleClass="addPanelGrid" style="margin-bottom:20px">
+                    <p:commandButton id="searchStockBtn" value="Tìm kho" styleClass="commonButton"
+                                     validateClient="true"
+                                     update="searchStockFieldSetId"
+                                     actionListener="#{agentAndStockMapController.doFindStockForEditing}">
+                    </p:commandButton>
+                  </p:panelGrid>
+                  <p:panelGrid columns="2" style="margin-bottom:20px" styleClass="searchCriteriaGrid"
+                               id="editingStockIdInfoPanel"
+                               columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input">
+                    <p:outputLabel value="Mã kho ">
+                      <p:outputLabel value="*" style="color:red"/>
+                    </p:outputLabel>
+                    <p:inputText value="#{agentAndStockMapController.editingStockAgentMapDTO.stockId}"
+                                 rendered="#{agentAndStockMapController.editingStockAgentMapDTO.stockId > 0}"
+                                 label="Mã kho"
+                                 disabled="true"
+                                 required="true"
+                                 styleClass="commonInputText"/>
+                    <p:inputText value="   " disabled="true"
+                                 rendered="#{agentAndStockMapController.editingStockAgentMapDTO.stockId == null or agentAndStockMapController.editingStockAgentMapDTO.stockId == 0}"
+                                 styleClass="commonInputText"/>
+
+                  </p:panelGrid>
+
+                </p:fieldset>
+              </h:form>
+
+              <h:form id="activateTimeFormInUpdateWidget">
+                <p:fieldset id="searchActivateTimeFieldSetId" legend="Thời gian hiệu lực" styleClass="addFieldSet">
+                  <p:panelGrid columns="5" style="margin-bottom:20px" styleClass="addPanelGrid"
+                               columnClasses="addPanelGrid-label, addPanelGrid-input, addPanelGrid-label, addPanelGrid-label, addPanelGrid-input">
+                    <p:outputLabel value="Ngày bắt đầu ">
+                      <p:outputLabel value="*" style="color:red"/>
+                    </p:outputLabel>
+                    <p:calendar id="editCreateDate"
+                                label="Ngày bắt đầu"
+                                showButtonPanel="true"
+                                value="#{agentAndStockMapController.editingStockAgentMapDTO.createDate}"
+                                navigator="true"
+                                required="true"
+                                mode="popup"
+                                pattern="dd/MM/yyyy"
+                                converter="customDateTimeConverter"
+                                placeholder="Click để chọn ngày...">
+                      <f:convertDateTime pattern="dd/MM/yyyy" timeZone="#{agentAndStockMapController.currentTimeZone}"/>
+                    </p:calendar>
+                    <p:outputLabel styleClass="emptySeperatorLabel" style="width:10px"/>
+                    <p:outputLabel value="Ngày kết thúc"/>
+                    <p:calendar id="editEndDate"
+                                label="Ngày kết thúc"
+                                value="#{agentAndStockMapController.editingStockAgentMapDTO.endDate}"
+                                widgetVar="editEndDateWidget"
+                                mindate="editEndDateWidget.today()"
+                                showButtonPanel="true"
+                                navigator="true"
+                                mode="popup"
+                                pattern="dd/MM/yyyy"
+                                converter="customDateTimeConverter"
+                                placeholder="Click để chọn ngày...">
+                      <f:convertDateTime pattern="dd/MM/yyyy" timeZone="#{agentAndStockMapController.currentTimeZone}"/>
+                    </p:calendar>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message id="messageForEditingCreateDate" for="editCreateDate"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message id="messageForEditigEndDate" for="editEndDate"/>
+
+                    <p:outputLabel value="Trạng thái ">
+                      <p:outputLabel value="*" style="color:red"/>
+                    </p:outputLabel>
+                    <p:selectOneMenu id="editStatusInfo" required="true" label="Trạng thái" style="width:170px"
+                                     value="#{agentAndStockMapController.editingStockAgentMapDTO.status}">
+                      <f:selectItem itemLabel="" itemValue=""/>
+                      <f:selectItems value="#{agentAndStockMapController.statusSelectItems}"/>
+                    </p:selectOneMenu>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message id="messageForEditingStatus" for="editStatusInfo"/>
+                  </p:panelGrid>
+                </p:fieldset>
+
+                <p:panelGrid columns="2" styleClass="addPanelGrid">
+                  <p:commandButton value="Chấp nhận" styleClass="commonButton"
+                                   onclick="PF('blockEntirePage').show()"
+                                   validateClient="true"
+                                   oncomplete="if(args.validationFailed ){
+                                      PF('blockEntirePage').hide();
+                                   }else{
+                                      PF('blockEntirePage').hide();
+                                      PF('agentAndStockMapUpdateWidget').hide();
+                                   }"
+                                   actionListener="#{agentAndStockMapController.doUpdateMap}"
+                                   update="messageForEditingCreateDate messageForEditigEndDate messageForEditingStatus :agentAndStockListForm:agentAndStockListFieldSetId">
+                  </p:commandButton>
+                  <p:commandButton value="Thoát" styleClass="commonButton"
+                                   onclick="PF('agentAndStockMapUpdateWidget').hide();">
+                  </p:commandButton>
+                </p:panelGrid>
+              </h:form>
+            </p:dialog>
+
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </ui:define>
+
+
+</ui:composition>
+

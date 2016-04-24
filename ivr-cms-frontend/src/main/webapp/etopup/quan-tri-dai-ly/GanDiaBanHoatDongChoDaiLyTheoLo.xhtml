@@ -1,0 +1,127 @@
+<ui:composition template="/include/etopup/layout-etopup-quantridaily.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+
+  <ui:define name="lib-header">
+  </ui:define>
+  <ui:define name="content">
+    <h:form id="frm2" enctype="multipart/form-data">  
+     <p:hotkey bind="f9"/>
+     <p:growl id="growl" showDetail="true" autoUpdate="true" globalOnly="true"/>
+      <table style="width: 100%; height: 100%">
+        <tbody>
+        <tr>
+          <td class="menu-left"><ui:insert>
+            <ui:include src="/include/etopup/menu-top-left-etopup-quantridaily.xhtml"/>
+          </ui:insert></td>
+          <td class="wr-main">
+            <div class="main">
+              <div class="top-bar-content">
+                <div class="origin">
+                  <a href="#{request.contextPath}/home/index.xhtml">Trang chủ</a>&#187;
+                  <a class="here">Quản trị đại lý</a>&#187;
+                  <a class="here">Gán địa bàn hoạt động của đại lý theo lô</a>
+                </div>
+              </div>
+	      <p:panel styleClass="main-panel-content">
+              <p:fieldset id="searchFieldSetId" legend="Tìm kiếm địa bàn hoạt động của đại lý" styleClass="searchFieldSet">
+              	<p:focus context="searchFieldSetId"/>
+              	<p:panelGrid columns="3" style="margin-bottom:20px" styleClass="searchCriteriaGrid"
+                               columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label">
+              	   <p:outputLabel value="Số thuê bao">
+                      <p:outputLabel value="*" styleClass="red-star"/>
+                    </p:outputLabel>
+                  <p:inputText id="msdnTxt" style="width:300px"
+                               value="#{agentAddressBatchManagementController.agentAddressMgmtDTO.msisdn}">
+                  </p:inputText>             
+                  <p:commandButton value="Tìm kiếm"
+                                 actionListener="#{agentAddressBatchManagementController.findAgentAddressList}"
+                                 update="messageForMsisdn growl resultList"
+                                 onclick="PF('blockEntirePage').show();"
+                                 oncomplete="PF('blockEntirePage').hide()"    
+                                 styleClass="commonButton" />
+                  <p:outputLabel styleClass="emptySeperatorLabel"/>
+                  <p:messages id="messageForMsisdn" for="msdnTxt" autoUpdate="false" />               
+              	</p:panelGrid>
+              </p:fieldset>
+              <p:fieldset styleClass="resultFieldSet" style="border: none">	
+              	<p:dataTable id="resultList" styleClass="table-list ft-left resultDataTable"
+                             columnClasses="col-15,col-20,col-10,col-10,col-10,col-10,col-15,col-10"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true"
+                             rows="15"
+                             rowKey="#{r.agentAddressId}"
+                             paginatorPosition="bottom"
+                             resizableColumns="true"
+                             selectionMode="single"
+                             value="#{agentAddressBatchManagementController.agentAddressDataModel}"
+                             var="r"
+                             emptyMessage="Không có bản ghi nào"
+                             >
+                  <p:column headerText="Số thuê bao" width="120"><p:outputLabel value="#{r.msisdn}"/></p:column>
+                  <p:column headerText="Tên đại lý" ><p:outputLabel value="#{r.agent.tradeName}"/></p:column>
+                  <p:column headerText="Miền" >
+                  	<p:outputLabel value="#{agentAddressBatchManagementController.showRegionInfo(r.region)}"/>
+                  </p:column>
+                  <p:column headerText="Tỉnh" ><p:outputLabel value="#{r.province}"/></p:column>
+                  <p:column headerText="Quận/Huyện"><p:outputLabel value="#{r.district}"/></p:column>
+                  <p:column headerText="Trạng thái" width="120">
+                  	<p:outputLabel value="#{agentAddressBatchManagementController.showStatusInfo(r.status)}"/>
+                  </p:column>
+                </p:dataTable>
+              </p:fieldset>
+              <p:fieldset legend="Nhập từ file" styleClass="searchFieldSet">
+                 <p:panelGrid columns="3" styleClass="searchCriteriaGrid"
+                 columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label">
+                     <p:outputLabel value="Tên file">
+                         <span class="red-star"
+                               style="margin: 0">*</span>
+                     </p:outputLabel>
+                     <p:inputText readonly="true" styleClass="search-list-popup" style="width:300px" id="uploadedFileName"
+                                  value="#{agentAddressBatchManagementController.uploadedFile.fileName}" />
+                          
+                     <p:fileUpload fileUploadListener="#{agentAddressBatchManagementController.handleFileUpload}" id="selectFile"
+                                    value="#{agentAddressBatchManagementController.uploadedFile}"
+                                    mode="advanced" dragDropSupport="false"
+                                    update="uploadedFileName fileContentError downloadErrorFileBtn"
+                                    sizeLimit="1000000" auto="true"
+                                    allowTypes="/(\.|\/)(txt)$/"
+                                    label="Chọn file"
+                                    styleClass="fileUpload-onebutton">
+                    </p:fileUpload>
+                    
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:messages id="fileContentError" autoUpdate="false"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                 </p:panelGrid>
+                 
+                 <p:panelGrid columns="2" styleClass="searchCriteriaGrid">
+                     <p:commandButton id="processFile" value="Gửi đi" styleClass="commonButton" style="margin-top:10px"
+                                      onclick="PF('blockEntirePage').show();"
+                                      oncomplete="PF('blockEntirePage').hide();"
+                                      actionListener="#{agentAddressBatchManagementController.doUploadBatch}"
+                                      update="downloadErrorFileBtn fileContentError selectFile"/>
+                     <p:commandButton id="downloadErrorFileBtn" value="Download file lỗi" styleClass="commonButton" style="margin-top:10px"
+                                      disabled="#{!agentAddressBatchManagementController.uploadedFileError}" ajax="false"
+                                      update="selectFile">
+                                      <p:fileDownload value="#{agentAddressBatchManagementController.errorFile}" />
+                     </p:commandButton>
+                 </p:panelGrid>
+
+             	</p:fieldset>
+             
+            </p:panel>  
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </h:form>
+  </ui:define>
+
+</ui:composition>
+

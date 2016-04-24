@@ -1,0 +1,81 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets">
+    <div class="main-menu-left">
+      <ul id="menu1" class="menu-left-collapse">
+        <li><a class="menuitem" href="ThongTinKhoHang.xhtml"> <i class="icon-categories"></i>
+            Thông tin 
+        </a></li>
+        <li><a class="menuitem" href="NhapHangTuNhaCungCap.xhtml"> <i class="icon-categories"></i>
+            Nhập hàng từ nhà cung cấp
+        </a></li>
+
+        <li><a class="collapsed menuitem"><i class="icon-categories"></i>
+            Điều chuyển xuống cấp dưới <i class="icon-categories-right"></i></a>
+          <ul class="michael">
+            <li><a class="sub-menu-item" href="XuatHangChoCapDuoi.xhtml">Xuất hàng cho kho cấp dưới</a></li>
+            
+            <li><a class="sub-menu-item" href="NhapHangVeTuCapTren.xhtml">Nhập hàng về từ cấp trên</a></li>
+          </ul></li>
+        <li><a class="collapsed menuitem"> <i class="icon-categories"></i>
+            Điều chuyển lên cấp trên <i class="icon-categories-right"></i>
+        </a>
+          <ul class="michael">
+            <li><a class="sub-menu-item" href="XuatHangTraChoCapTren.xhtml">Xuất hàng trả cho cấp trên</a></li>
+            <li><a class="sub-menu-item" href="NhapHangTraVeTuCapDuoi.xhtml">Nhập hàng trả lại từ cấp dưới</a></li>
+            <li><a class="sub-menu-item" href="HangTraTuChoiTuCapTren.xhtml">Nhập lại hàng trả từ chối từ cấp
+                trên</a></li>
+          </ul></li>
+        <li><a class="collapsed menuitem"> <i class="icon-categories"></i>
+            Điều chuyển trong cửa hàng <i class="icon-categories-right"></i>
+        </a>
+          <ul class="michael">
+            <li><a class="sub-menu-item" href="XuatKhoChoNhanVien.xhtml">Xuất kho cho nhân viên</a></li>
+            <li><a class="sub-menu-item" href="NhapKhoDoNhanVienTraLai.xhtml">Nhập kho do nhân viên trả lại</a></li>
+            <li><a class="sub-menu-item" href="NhapHangTonKho.xhtml">Nhập hàng tồn kho trong ngày từ nhân viên</a></li>
+            <li><a class="sub-menu-item" href="ChuyenHangThanhHangHong.xhtml">Chuyển hàng thành hàng hỏng</a></li>
+            <li><a class="sub-menu-item" href="XuatBanChoKhachHang.xhtml">Xuất bán cho khách hàng</a></li>
+            <li><a class="sub-menu-item" href="NhapHangTraLaiTuKhachHang.xhtml">Nhập hàng trả lại từ khách hàng</a></li>
+            <li><a class="sub-menu-item" href="XuatHangBanChoKhachHangTheoLo.xhtml">Xuất hàng bán cho khách hàng
+                theo lô</a></li>
+          </ul></li>
+        <li><a class="collapsed menuitem"> <i class="icon-categories"></i>
+            Điều chuyển không phân cấp <i class="icon-categories-right"></i>
+        </a>
+          <ul class="michael">
+            <li><a class="sub-menu-item" href="XuatKhoKhongPhanCap.xhtml">Xuất kho không phân cấp</a></li>
+            <li><a class="sub-menu-item" href="NhapKhoKhongPhanCap.xhtml">Nhập kho không phân cấp</a></li>
+          </ul></li>
+        <li><a class="menuitem" href="TraCuuGiaoDichXuatNhapKho.xhtml"> <i
+            class="icon-categories"></i>
+            Tra cứu giao dịch xuất nhập kho
+        </a>
+        </li>
+        <li><a class="menuitem" href="TraCuuHangHoaTheoSerial.xhtml"> <i
+            class="icon-categories"></i>
+            Tra cứu hàng hóa theo serial
+        </a></li>
+      </ul>
+    </div>
+    <script type="text/javascript">
+  $(document).ready(function () {
+    var addressValue = window.location.pathname;
+    $( ".menuitem" ).each(function( index ) {
+       
+       if(addressValue.indexOf($(this).attr("href")) > 0) {
+          $(this).attr("id", "selected");
+       }
+      });
+
+      $( ".sub-menu-item" ).each(function( index ) {
+        if(addressValue.indexOf($(this).attr("href")) > 0) {
+      	  $(".sub-menu-item").removeClass('selected');
+      	  $($(this).parent().parent()).show();
+          $($(this).parent().parent().parent().children()[0]).attr("id", "selected");
+          $(this).addClass('selected');
+          console.log($(this).parent().parent().parent().children()[0]);
+        }
+       });
+    });
+    
+  </script>
+  </ui:composition>

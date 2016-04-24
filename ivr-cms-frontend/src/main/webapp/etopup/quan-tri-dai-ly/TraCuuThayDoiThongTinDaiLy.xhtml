@@ -1,0 +1,143 @@
+<ui:composition template="/include/etopup/layout-etopup-quantridaily.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+
+  <ui:define name="lib-header">
+  </ui:define>
+  <ui:define name="content">
+    <h:form>
+      <p:growl id="growl" showDetail="true" autoUpdate="true" globalOnly="true"/>
+      <table style="width: 100%; height: 100%">
+        <tbody>
+        <tr>
+          <td class="menu-left"><ui:insert>
+            <ui:include src="/include/etopup/menu-top-left-etopup-quantridaily.xhtml"/>
+          </ui:insert></td>
+          <td class="wr-main">
+            <div class="main">
+
+              <div class="top-bar-content">
+                <div class="origin">
+                  <a href="#{request.contextPath}/home/index.xhtml">Trang chủ</a>
+                  <a class="here">Quản trị đại lý</a>&#187;
+                  <a class="here">Tra cứu thay đổi thông tin đại lý</a>
+                </div>
+              </div>
+
+              <p:panel styleClass="main-panel-content">
+                <h:form id="searchForm">
+                  <p:fieldset id="searchFieldSetId" legend="Điều kiện lọc" styleClass="searchFieldSet">
+                    <p:focus context="searchFieldSetId"/>
+                    <p:panelGrid columns="5" style="margin-bottom:20px" styleClass="searchCriteriaGrid"
+                                 columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label, searchCriteriaGrid-label, searchCriteriaGrid-input">
+                      <p:outputLabel value="Số thuê bao">
+                        <p:outputLabel value="*" styleClass="red-star"/>
+                      </p:outputLabel>
+                      <p:inputText id="msisdnInfo"
+                                   label="Số thuê bao"
+                                   required="true"
+                                   value="#{agentHistoryLookupController.agentDataChangeDTO.agentMSISDN}">
+                        <f:validator validatorId="requiredContentValidator"/>
+                        <f:validator validatorId="phoneValidator"/>
+                      </p:inputText>
+                      <p:outputLabel styleClass="emptySeperatorLabel"/>
+                      <p:outputLabel value="Trường thay đổi"/>
+                      <p:selectOneMenu label="Trường thay đổi"
+                                       value="#{agentHistoryLookupController.agentDataChangeDTO.fieldName}">
+                        <f:selectItems value="#{agentHistoryLookupController.fieldSelectItems}"/>
+                      </p:selectOneMenu>
+
+                      <p:outputLabel styleClass="emptySeperatorLabel"/>
+                      <p:message for="msisdnInfo"/>
+                      <p:outputLabel styleClass="emptySeperatorLabel"/>
+                      <p:outputLabel styleClass="emptySeperatorLabel"/>
+                      <p:outputLabel styleClass="emptySeperatorLabel"/>
+
+                      <p:outputLabel value="Từ ngày"/>
+                      <p:calendar id="fromDate"
+                                  showButtonPanel="true"
+                                  navigator="true"
+                                  mode="popup"
+                                  value="#{agentHistoryLookupController.agentDataChangeDTO.fromDate}"
+                                  pattern="dd/MM/yyyy"
+                                  converter="customDateTimeConverter"
+                                  placeholder="Click để chọn ngày..."/>
+                      <p:outputLabel styleClass="emptySeperatorLabel"/>
+                      <p:outputLabel value="Đến ngày"/>
+                      <p:calendar id="endDate"
+                                  showButtonPanel="true"
+                                  navigator="true"
+                                  mode="popup"
+                                  value="#{agentHistoryLookupController.agentDataChangeDTO.toDate}"
+                                  pattern="dd/MM/yyyy"
+                                  converter="customDateTimeConverter"
+                                  placeholder="Click để chọn ngày..."/>
+
+                    </p:panelGrid>
+
+                    <p:panelGrid columns="1" styleClass="searchCriteriaGrid" style="margin-top:20px">
+                      <p:commandButton id="findActionListBtn"
+                                       value="Tìm kiếm"
+                                       styleClass="commonButton"
+                                       onclick="histDataTableWidget.getPaginator().setPage(0);PF('blockEntirePage').show();"
+                                       oncomplete="PF('blockEntirePage').hide()"
+                                       actionListener="#{agentHistoryLookupController.doFindHist}"
+                                       validateClient="true"
+                                       update="searchFieldSetId actionListFieldSet"/>
+                    </p:panelGrid>
+
+                  </p:fieldset>
+
+                  <p:fieldset id="actionListFieldSet" legend="Danh sách tác động" styleClass="resultFieldSet">
+                    <p:dataTable styleClass="table-list ft-left resultDataTable"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 paginator="true"
+                                 rows="15"
+                                 rowKey="#{agentHistInfo}"
+                                 paginatorPosition="bottom"
+                                 resizableColumns="true"
+                                 emptyMessage="Không có thông tin nào"
+                                 lazy="true"
+                                 selectionMode="single"
+                                 widgetVar="histDataTableWidget"
+                                 value="#{agentHistoryLookupController.agentChangeHistoryLazyDataModel}"
+                                 var="agentHistInfo">
+
+                      <p:column headerText="Ngày thực hiện" style="width:120px">
+                        <p:outputLabel value="#{agentHistInfo.actionDate}">
+                          <f:convertDateTime pattern="dd/MM/yyyy" />
+                        </p:outputLabel>
+                      </p:column>
+                      <p:column headerText="Người sử dụng">
+                        #{agentHistInfo.user}
+                      </p:column>
+                      <p:column headerText="Địa chỉ IP">
+                        #{agentHistInfo.ipAddress}
+                      </p:column>
+                      <p:column headerText="Tên trường">
+                        <h:outputText value="#{agentHistoryLookupController.showFieldName(agentHistInfo.fieldName)}" />
+                      </p:column>
+                      <p:column headerText="Giá trị cũ">
+                        #{agentHistInfo.oldValue}
+                      </p:column>
+                      <p:column headerText="Giá trị mới">
+                        #{agentHistInfo.newValue}
+                      </p:column>
+                    </p:dataTable>
+                  </p:fieldset>
+                </h:form>
+              </p:panel>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </h:form>
+  </ui:define>
+
+</ui:composition>
+

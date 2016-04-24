@@ -1,0 +1,350 @@
+<ui:composition template="/include/etopup/layout-etopup-quanlytaikhoan.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                xmlns:o="http://omnifaces.org/ui">
+
+  <f:metadata>
+    <f:event type="preRenderView" listener="#{tldTransferController.initForOpeningPage}"/>
+  </f:metadata>
+
+  <ui:define name="lib-header">
+  </ui:define>
+  <ui:define name="content">
+    <p:growl id="growl" showDetail="true" autoUpdate="true" globalOnly="true"/>
+    <table style="width: 100%; height: 100%">
+      <tbody>
+      <tr>
+        <td class="menu-left"><ui:insert>
+          <ui:include src="/include/etopup/menu-top-left-etopup-quanlytaikhoan.xhtml"/>
+        </ui:insert></td>
+        <td class="wr-main">
+          <div class="main">
+            <div class="top-bar-content">
+              <div class="origin">
+                <a href="#{request.contextPath}/home/index.xhtml">Trang chủ</a>&#187;
+                <a class="here">Quản lý tài khoản</a>&#187;
+                <a class="here">Chức năng chuyển tiền</a>
+              </div>
+            </div>
+
+            <p:panel styleClass="main-panel-content">
+              <h:form id="transLookupForm">
+                <p:fieldset id="searchFieldSetId" legend="Điều kiện tra cứu giao dịch" styleClass="searchFieldSet">
+                  <p:focus context="searchFieldSetId"/>
+                  <p:panelGrid columns="5" styleClass="searchCriteriaGrid"
+                               columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label, searchCriteriaGrid-label, searchCriteriaGrid-input">
+
+                    <p:outputLabel value="Từ ngày"/>
+                    <p:calendar id="startDate"
+                                showButtonPanel="true"
+                                navigator="true"
+                                value="#{tldTransferController.transactionManagementDTO.startDate}"
+                                mode="popup"
+                                pattern="dd/MM/yyyy"
+                                placeholder="Click để chọn ngày..."/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Đến ngày"/>
+                    <p:calendar id="endDate"
+                                showButtonPanel="true"
+                                navigator="true"
+                                value="#{tldTransferController.transactionManagementDTO.endDate}"
+                                mode="popup"
+                                pattern="dd/MM/yyyy"
+                                placeholder="Click để chọn ngày..."/>
+
+                    <p:outputLabel value="Trạng thái"/>
+                    <p:selectOneMenu id="transType" label="Trạng thái giao dịch" style="width: 157px;"
+                                     value="#{tldTransferController.transactionManagementDTO.processStatus}">
+                      <f:selectItem itemLabel="Tất cả" itemValue=""/>
+                      <f:selectItems value="#{tldTransferController.processStatusSelectItems}"/>
+                    </p:selectOneMenu>
+                  </p:panelGrid>
+
+                  <p:panelGrid columns="1" styleClass="searchCriteriaGrid" style="margin-top:10px; margin-bottom:10px">
+                    <p:commandButton id="searchBtn"
+                                     value="Tìm kiếm"
+                                     styleClass="commonButton"
+                                     onclick="PF('blockEntirePage').show();datatableWidget.getPaginator().setPage(0);"
+                                     oncomplete="PF('blockEntirePage').hide()"
+                                     actionListener="#{tldTransferController.findTLDTrans}"
+                                     update=":transListForm:transactionListFieldSet">
+                    </p:commandButton>                 
+                  </p:panelGrid>
+
+                </p:fieldset>
+              </h:form>
+			  <p:fieldset legend="Khởi tạo giao dịch">
+			  <h:form id="searchAgentForm">
+                <p:fieldset id="searchAgentFieldSetId" legend="Tìm kiếm đại lý">
+                  <p:panelGrid columns="3" style="margin-bottom:20px" styleClass="searchCriteriaGrid"
+                               columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label">
+                    <p:outputLabel value="Số thuê bao">
+                      <p:outputLabel value="*" styleClass="red-star"/>
+                    </p:outputLabel>
+                    <p:inputText id="msisdn" label="Số thuê bao" value="#{tldTransferController.msisdn}"
+                                 style="width:300px" required="true">
+                      <o:validator validatorId="requiredContentValidator"/>
+                      <f:validator validatorId="phoneValidator"/>
+                    </p:inputText>
+                    <p:commandButton id="searchAgentBtn" value="Lấy thông tin đại lý" styleClass="commonButton"
+                                     onclick="PF('blockEntirePage').show()" oncomplete="PF('blockEntirePage').hide()"
+                                     update="searchAgentFieldSetId :createTLDTransForm:transactionDetailFieldSet :createTLDTransForm:createTransPg"
+                                     actionListener="#{tldTransferController.doFindAgent}">
+                      <p:resetInput target=":createTLDTransForm" />               
+                    </p:commandButton>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message id="messageForMsisdn" for="msisdn" escape="false"/>
+                  </p:panelGrid>
+
+                  <p:panelGrid id="agentResultGrid"
+                               columns="4" style="margin-bottom:20px" styleClass="resultGrid"
+                               columnClasses="resultGrid-label, resultGrid-input, resultGrid-label, resultGrid-input">
+                    <p:outputLabel value="Tên thương mại"/>
+                    <p:inputText value="#{tldTransferController.processingAgent.tradeName}"
+                                 styleClass="commonInputText"
+                                 disabled="true"/>
+                    <p:outputLabel value="Chủ sở hữu"/>
+                    <p:inputText value="#{tldTransferController.processingAgent.ownerName}"
+                                 styleClass="commonInputText"
+                                 disabled="true"/>
+                    <p:outputLabel value="Mã đại lý"/>
+                    <p:inputText value="#{tldTransferController.processingAgent.sapCode}"
+                                 styleClass="commonInputText"
+                                 disabled="true"/>
+                    <p:outputLabel value="Địa chỉ"/>
+                    <p:inputText value="#{tldTransferController.processingAgent.outletAddress}"
+                                 styleClass="commonInputText"
+                                 disabled="true"/>             
+                  </p:panelGrid>
+                </p:fieldset>
+              </h:form>
+              
+			  <h:form id="createTLDTransForm">
+                <p:fieldset id="transactionDetailFieldSet" legend="Khởi tạo chuyển tiền">
+                  <p:panelGrid columns="5" styleClass="resultGrid" style="margin-top:10px; margin-bottom:30px"
+                               columnClasses="resultGrid-label, resultGrid-input, resultGrid-label, resultGrid-label, resultGrid-input">
+                    <p:outputLabel value="Mã đơn hàng">
+                    	<p:outputLabel value="*" style="color:red" />
+                    </p:outputLabel>
+                    <p:inputText id="orderNumber" value="#{tldTransferController.tldTransDTO.orderNumber}" required="true"
+                                 styleClass="commonInputText" label="mã đơn hàng">
+                      <o:validator validatorId="requiredContentValidator"/>
+                      <o:validator validatorId="nameValidator"/>
+                      <f:validateLength maximum="50"/>
+                    </p:inputText>             
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Ngày đơn hàng">
+                    	<p:outputLabel value="*" style="color:red" />
+                    </p:outputLabel>
+                    <p:calendar id="lopDate" pattern="dd/MM/yyyy" converter="customDateTimeConverter" required="true"
+                                value="#{tldTransferController.tldTransDTO.lopDate}" label="ngày đơn hàng"
+                                widgetVar="lopDateWidget"
+								maxdate="lopDateWidget.today()"  />
+					
+					<p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="orderNumber"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="lopDate"/>
+					
+                    <p:outputLabel value="Lượng tiền chuyển">
+                    	<p:outputLabel value="*" style="color:red" />
+                    </p:outputLabel>
+                    <pe:inputNumber id="transAmount" styleClass="commonInputNumber" required="true"
+                                        value="#{tldTransferController.tldTransDTO.transAmount}"
+                                        decimalPlaces="4" maxValue="99999999999999"
+                                        decimalSeparator="." thousandSeparator="," label="lượng tiền chuyển" />             
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Hoa hồng chiết khấu">
+                    	<p:outputLabel value="*" style="color:red" />
+                    </p:outputLabel>
+                    <pe:inputNumber id="commission" styleClass="commonInputNumber" required="true"
+                                        value="#{tldTransferController.tldTransDTO.commission}"
+                                        minValue="0"
+                                        maxValue="100"
+                                        label="Hoa hồng chiết khấu" />             
+                    
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="transAmount"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="commission"/>
+                                 
+                    <p:outputLabel value="Đơn vị bán hàng">
+                    	<p:outputLabel value="*" style="color:red" />
+                    </p:outputLabel>
+                    <p:selectOneMenu id="transType" label="Đơn vị bán hàng"
+                                     value="#{tldTransferController.tldTransDTO.centreId}">
+                      <f:selectItems value="#{tldTransferController.centreSelectItems}"/>
+                    </p:selectOneMenu>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Phương pháp thanh toán"/>
+                    <p:inputText id="paymentMethod" value="#{tldTransferController.tldTransDTO.paymentMethod}"
+                                 styleClass="commonInputText" label="phương pháp thanh toán">
+                      <f:validateLength maximum="100"/>
+                    </p:inputText>
+                    
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="paymentMethod"/>
+                    
+                    <p:outputLabel value="Số hợp đồng"/>
+                    <p:inputText id="contractNo" value="#{tldTransferController.tldTransDTO.contractNo}"
+                                 styleClass="commonInputText" label="số hợp đồng">
+                      <f:validateLength maximum="100"/>
+                    </p:inputText>             
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Ngày hợp đồng"/>
+                    <p:calendar pattern="dd/MM/yyyy" converter="customDateTimeConverter"
+                                value="#{tldTransferController.tldTransDTO.contractDate}"
+                                widgetVar="contractDateWidget"
+								maxdate="contractDateWidget.today()" />
+								
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="contractNo"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                                 
+                    <p:outputLabel value="Người nhận"/>
+                    <p:inputText id="recipient" value="#{tldTransferController.tldTransDTO.recipient}"
+                                 styleClass="commonInputText" label="người nhận">
+                      <f:validateLength maximum="100"/>          
+                    </p:inputText>             
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Số CMT"/>
+                    <p:inputText id="idNumber" value="#{tldTransferController.tldTransDTO.idNo}"
+                                 styleClass="commonInputText" label="số CMT">
+                      <o:validator validatorId="numberValidator"/>
+                      <f:validateLength maximum="12"/>
+                    </p:inputText>             
+					
+					<p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="recipient"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="idNumber"/>
+					
+					<p:outputLabel value="Ngày cấp"/>
+                    <p:calendar pattern="dd/MM/yyyy" converter="customDateTimeConverter"
+                                value="#{tldTransferController.tldTransDTO.dateIssue}" 
+                                widgetVar="issueDateWidget"
+								maxdate="issueDateWidget.today()" />
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Nơi cấp"/>
+                    <p:inputText id="placeIssue" value="#{tldTransferController.tldTransDTO.placeIssue}"
+                                 styleClass="commonInputText" label="nơi cấp">
+                      <f:validateLength maximum="100"/>             
+                    </p:inputText>
+                    
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="placeIssue"/>             
+                  </p:panelGrid>
+                </p:fieldset>
+                <p:panelGrid id="createTransPg" columns="1" styleClass="searchCriteriaGrid" style="margin-top:10px; margin-bottom:10px">
+                    <p:commandButton id="createBtn"
+                                     value="Tạo giao dịch"
+                                     validateClient="true"
+                                     disabled="#{not tldTransferController.enableToCreateTLDTrans}"
+                                     styleClass="commonButton"
+                                     onclick="PF('blockEntirePage').show();"
+                                     oncomplete="PF('blockEntirePage').hide()"
+                                     actionListener="#{tldTransferController.createTLDTrans}"
+                                     update="transactionDetailFieldSet :transListForm:transactionListFieldSet"/>
+                </p:panelGrid>
+              </h:form>
+              </p:fieldset>	
+              <h:form id="transListForm">
+                <p:fieldset id="transactionListFieldSet" legend="Thông tin giao dịch" styleClass="resultFieldSet">
+                  <p:dataTable styleClass="table-list ft-left resultDataTable"
+                               paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                               paginator="true"
+                               rows="15"
+                               rowKey="#{trans.transId}"
+                               paginatorPosition="bottom"
+                               resizableColumns="true"
+                               emptyMessage="Không có bản ghi nào"
+                               lazy="true"
+                               value="#{tldTransferController.tldTransactionLazyDataModel}"
+                               var="trans"
+                               widgetVar="datatableWidget"
+                               selection="#{tldTransferController.selectedTrans}">
+					<p:column selectionMode="multiple" style="width:2%"/>
+                    <p:column headerText="Mã GD">
+                      <h:outputText value="#{trans.transId}"/>
+                    </p:column>
+                    <p:column headerText="Ngày tạo">
+                      <h:outputText value="#{trans.createDate}">
+                      	<f:convertDateTime pattern="dd/MM/yyyy" timeZone="#{tldTransferController.currentTimeZone}"/>
+                      </h:outputText>
+                    </p:column>
+                    <p:column headerText="Người tạo">
+                      <h:outputText value="#{tldTransferController.getCreator(trans)}"/>
+                    </p:column>
+                    <p:column headerText="Mã đơn hàng">
+                      <h:outputText value="#{tldTransferController.getOrderNumber(trans)}"/>
+                    </p:column>
+                    <p:column headerText="Lượng tiền chuyển">
+                      <h:outputText value="#{trans.transAmount}"/>
+                    </p:column>
+                    <p:column headerText="Hh/CK">
+                      <h:outputText value="#{tldTransferController.getCommission(trans)}"/>
+                    </p:column>
+                    <p:column headerText="Tên đại lý">
+                      <h:outputText value="#{tldTransferController.getAgentTradeName(trans)}"/>
+                    </p:column>
+                    <p:column headerText="Số TB">
+                      <h:outputText value="#{trans.targetMsisdn}"/>
+                    </p:column>
+                    <p:column headerText="Mã tham chiếu">
+                      <h:outputText value="No data"/>
+                    </p:column>
+                    <p:column headerText="Trạng thái">
+                      <h:outputText value="#{tldTransferController.showTransProcessStatus(trans)}"/>
+                    </p:column>
+                  </p:dataTable>
+                </p:fieldset>
+                <p:panelGrid columns="2" styleClass="searchCriteriaGrid" style="margin-top:10px; margin-bottom:10px">
+                     <p:commandButton id="acceptBtn"
+                                      value="Duyệt"
+                                      styleClass="commonButton"
+                                      onclick="PF('blockEntirePage').show()"
+                                      oncomplete="PF('blockEntirePage').hide()"
+                                      update="transactionListFieldSet"
+                                      actionListener="#{tldTransferController.completeTLDTrans}"/>
+                     <p:commandButton id="declineBth"
+                                      value="Từ chối"
+                                      styleClass="commonButton"
+                                      onclick="PF('blockEntirePage').show()"
+                                      oncomplete="PF('blockEntirePage').hide()"
+                                      update="transactionListFieldSet"
+                                      actionListener="#{tldTransferController.rejectTLDTrans}"/>
+                </p:panelGrid>
+              </h:form>
+
+            </p:panel>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+    <script type="text/javascript">
+      function resetTransCreationForm(xhr, status, args) {
+        if (args.validationFailed || !args.updateStatus) {
+          //PF('dlg2').jq.effect("shake", {times:5}, 100);
+        } else if (!openStatus) {
+          dlg2.hide();
+        }
+      }
+    </script>
+  </ui:define>
+</ui:composition>

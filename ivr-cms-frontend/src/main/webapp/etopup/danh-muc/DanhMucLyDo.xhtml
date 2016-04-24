@@ -1,0 +1,254 @@
+<ui:composition template="/include/etopup/layout-etopup-danhmuc.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+  <ui:define name="lib-header">
+  </ui:define>
+  <ui:define name="content">
+    <h:form id="frm">
+      <p:hotkey bind="f9"/>
+      <p:growl id="growl" showDetail="true" autoUpdate="true" globalOnly="true"/>
+      <table style="width: 100%; height: 100%">
+        <tbody>
+        <tr>
+          <td class="menu-left"><ui:insert>
+            <ui:include src="/include/etopup/menu-top-left-etopup-danhmuc.xhtml"/>
+          </ui:insert></td>
+          <td class="wr-main">
+            <div class="main">
+              <div class="top-bar-content">
+                <div class="origin">
+                  <a href="#{request.contextPath}/home/index.xhtml">Trang chủ</a>&#187;
+                  <a class="here">Danh mục</a>&#187;
+                  <a class="here">Danh mục lý do</a>
+                </div>
+              </div>
+              <!-- Adhere -->
+              <p:panel id="searchPanel" styleClass="main-panel-content">
+                <p:focus context="searchPanel"/>
+                <p:fieldset legend="Thông tin tìm kiếm" styleClass="searchFieldSet">
+                  <p:panelGrid columns="4" styleClass="searchCriteriaGrid"
+                  	columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label, searchCriteriaGrid-input">
+                    <p:outputLabel styleClass="label-info-staff" value="Mã lý do"/>
+                    <p:inputText id="reasonCodeTxt" styleClass="search-staff"
+                                 value="#{reasonListController.reasonDTO.code}"/>
+                    <p:outputLabel value="Mô tả"/>
+                    <p:inputText id="reasonDescTxtArea" styleClass="search-staff"
+                                 value="#{reasonListController.reasonDTO.reasonDescribe}"/>
+                    <p:outputLabel value="Trạng thái"/>
+                    <p:selectOneMenu styleClass="select-bill"
+                                     value="#{reasonListController.reasonDTO.statusNumberValue}">
+                      <f:selectItem itemValue="" itemLabel="Tất cả    "/>
+                      <f:selectItems value="#{reasonListController.reasonStatusMap.entrySet()}"
+                                     var="rs" itemValue="#{rs.key}" itemLabel="#{rs.value}"></f:selectItems>
+                    </p:selectOneMenu>
+                  </p:panelGrid>
+                  <p:panelGrid columns="1" styleClass="searchCriteriaGrid" style="margin-top:10px">
+                    <p:commandButton value="Tìm kiếm"
+                                     styleClass="commonButton"
+                                     onclick="reasonListWidget.getPaginator().setPage(0);"
+                                     actionListener="#{reasonListController.findReasons}"
+                                     update="reasonList"/>
+                  </p:panelGrid>
+                </p:fieldset>
+                <p:fieldset legend="Danh sách lý do" styleClass="resultFieldSet">
+                  <p:commandButton value="Thêm"
+                                   styleClass="commonButton"
+                                   style="margin-bottom:15px; margin-left:15px;"
+                                   actionListener="#{reasonListController.onNewReason}"
+                                   update=":frm1:newReasonPg"
+                                   oncomplete="PF('addNewReasonDlg').show()">
+                    <p:resetInput target=":addReasonId"/>
+                  </p:commandButton>
+                  <p:dataTable id="reasonList" styleClass="table-list ft-left resultDataTable"
+                               columnClasses="col-15,col-20,col-10,col-10,col-10,col-10,col-15,col-10"
+                               paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                               paginator="true"
+                               rows="15"
+                               rowKey="#{r.code}"
+                               paginatorPosition="bottom"
+                               resizableColumns="true"
+                               selectionMode="single"
+                               value="#{reasonListController.reasonsLazyDataModel}"
+                               lazy="true"
+                               var="r"
+                               widgetVar="reasonListWidget"
+                               emptyMessage="Không có bản ghi nào.">
+                    <p:column headerText="Mã lý do" width="90" sortBy="code"><p:outputLabel
+                      value="#{r.code}"/></p:column>
+                    <p:column headerText="Mô tả" sortBy="reasonDescribe"><p:outputLabel
+                      value="#{r.reasonDescribe}"/></p:column>
+                    <p:column headerText="Trạng thái" width="120" sortBy="status"><p:outputLabel
+                      value="#{r.statusInfo}"/></p:column>
+                    <p:column width="60">
+                      <p:commandLink title="Chỉnh sửa" styleClass="bt-edit"
+                                     actionListener="#{reasonListController.onEditReason(r)}"
+                                     update=":frm2:editReasonFs"
+                                     oncomplete="PF('editReasonDlg').show()">
+                      </p:commandLink>
+                      <p:commandLink title="Xóa" styleClass="bt-delete-2"
+                                     actionListener="#{reasonListController.deleteReason(r)}"
+                                     update="reasonList :frm:growl"
+                                     oncomplete="PF('blockEntirePage').hide()">
+                        <p:confirm header="Xác nhận" message="Bạn có muốn xóa?" icon="ui-icon-alert"/>
+                      </p:commandLink>
+                    </p:column>
+                  </p:dataTable>
+                </p:fieldset>
+              </p:panel>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </h:form>
+    
+    <p:dialog header="Thêm mới lý do"
+                widgetVar="addNewReasonDlg"
+                resizable="false"
+                id="addReasonId"
+                modal="true">
+      <h:form id="frm1">          
+        <p:fieldset legend="Thông tin" styleClass="addFieldSet">
+          <!-- <p:messages id="msgs" /> -->
+          <p:panelGrid id="newReasonPg" columns="2" style="border: none" styleClass="searchCriteriaGrid"
+          	columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input">
+            <p:outputLabel value="Mã lý do">
+              	<span class="red-star"
+                      style="margin: 0">*</span>
+            </p:outputLabel>
+            <p:inputText id="newReasonCodeTxt" styleClass="search-staff" label="mã lý do"
+                         value="#{reasonListController.reason.code}"
+                         required="true" requiredMessage="Bạn phải nhập mã lý do">
+              <!-- <f:validateLength minimum="1" maximum="10" />
+           <f:validateRegex pattern="([a-zA-Z0-9]{1,10})" /> -->
+              <f:validator validatorId="etopupReasonCodeValidator"/>
+            </p:inputText>
+            <p:outputLabel styleClass="emptySeperatorLabel"/>
+            <p:message for="newReasonCodeTxt" display="text"/>
+            <p:outputLabel value="Mô tả">
+              	<span class="red-star"
+                      style="margin: 0">*</span>
+            </p:outputLabel>
+            <p:inputText id="newReasonDescTxt" styleClass="search-staff" label="mô tả lý do"
+                         value="#{reasonListController.reason.reasonDescribe}"
+                         required="true" requiredMessage="Bạn phải nhập mô tả lý do">
+              <f:validateLength minimum="1" maximum="200"/>
+              <f:validator validatorId="etopupReasonDescriptionValidator"/>
+            </p:inputText>
+            <p:outputLabel styleClass="emptySeperatorLabel"/>
+            <p:message for="newReasonDescTxt" display="text"/>
+            <p:outputLabel value="Trạng thái"/>
+            <p:selectOneMenu styleClass="select-bill" value="#{reasonListController.reason.statusNumberValue}">
+              <f:selectItems value="#{reasonListController.reasonStatusMap.entrySet()}"
+                             var="rs" itemValue="#{rs.key}" itemLabel="#{rs.value}"></f:selectItems>
+            </p:selectOneMenu>
+          </p:panelGrid>
+
+          <p:panelGrid columns="3" style="margin-top:20px" styleClass="searchCriteriaGrid">
+            <p:commandButton value="Chấp nhận"
+                             styleClass="commonButton"
+                             validateClient="true"
+                             actionListener="#{reasonListController.doCreateReason}"
+                             update=":frm1:newReasonPg :frm:reasonList :frm:growl"
+                             oncomplete="handleSavingData(xhr, status, args)"/>
+            <p:commandButton value="Thoát"
+                             styleClass="commonButton"
+                             oncomplete="PF('addNewReasonDlg').hide()"/>
+            <p:panel styleClass="groupPanel">
+              <p:selectBooleanCheckbox id="open-status" value="#{reasonListController.displayPopup}"/>
+              <h:outputText value="Không ẩn popup" style="margin-left: 10px"/>
+            </p:panel>
+          </p:panelGrid>
+        </p:fieldset>
+      </h:form>  
+    </p:dialog>
+    
+
+    <!-- Hop thoai chinh sua ly do -->
+    
+    <p:dialog header="Chỉnh sửa lý do"
+                widgetVar="editReasonDlg"
+                resizable="false"
+                id="editReasonId"
+                modal="true">
+      <h:form id="frm2">          
+        <p:fieldset id="editReasonFs" legend="Thông tin chỉnh sửa" styleClass="addFieldSet">
+          <!-- <p:messages id="msgs2" /> -->
+          <p:panelGrid id="editReasonPg" columns="2" style="border: none" styleClass="searchCriteriaGrid"
+          	columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input">
+            <p:outputLabel value="Mã lý do">
+              	<span class="red-star"
+                      style="margin: 0">*</span>
+            </p:outputLabel>
+            <p:inputText id="editReasonCodeTxt" styleClass="search-staff"
+                         label="mã lý do"
+                         value="#{reasonListController.selectedReason.code}"
+                         required="true" requiredMessage="Bạn phải nhập mã lý do">
+              <!-- <f:validateLength minimum="1" maximum="10" />
+           <f:validateRegex pattern="([a-zA-Z0-9]{1,10})" /> -->
+              <f:validator validatorId="etopupReasonCodeValidator"/>
+            </p:inputText>
+            <p:outputLabel/>
+            <p:message for="editReasonCodeTxt"/>
+            <p:outputLabel value="Mô tả">
+              	<span class="red-star"
+                      style="margin: 0">*</span>
+            </p:outputLabel>
+            <p:inputText id="editReasonDescTxt" styleClass="search-staff" label="mô tả lý do"
+                         value="#{reasonListController.selectedReason.reasonDescribe}"
+                         required="true" requiredMessage="Bạn phải nhập mô tả lý do">
+              <f:validateLength minimum="1" maximum="200"/>
+              <f:validator validatorId="etopupReasonDescriptionValidator"/>
+            </p:inputText>
+            <p:outputLabel/>
+            <p:message for="editReasonDescTxt"/>
+            <p:outputLabel value="Trạng thái"/>
+            <p:selectOneMenu styleClass="select-bill" value="#{reasonListController.selectedReason.statusNumberValue}">
+              <f:selectItems value="#{reasonListController.reasonStatusMap.entrySet()}"
+                             var="rs" itemValue="#{rs.key}" itemLabel="#{rs.value}"></f:selectItems>
+            </p:selectOneMenu>
+          </p:panelGrid>
+
+          <p:panelGrid columns="2" style="margin-top:20px" styleClass="searchCriteriaGrid">
+            <p:commandButton value="Chấp nhận"
+                             styleClass="commonButton"
+                             oncomplete="handleUpdatingData(xhr, status, args)"
+                             actionListener="#{reasonListController.doUpdateReason}"
+                             validateClient="true"
+                             update=":frm2:editReasonPg :frm:reasonList :frm:growl"/>
+            <p:commandButton value="Thoát"
+                             styleClass="commonButton"
+                             oncomplete="PF('editReasonDlg').hide()"/>
+            <!-- <p:panel styleClass="groupPanel">
+             <p:selectBooleanCheckbox id="open-status-2" value="#{reasonListController.displayPopup}"/>
+             <h:outputText value="Không ẩn popup" style="margin-left: 10px"/>
+           </p:panel> -->
+          </p:panelGrid>
+        </p:fieldset>
+      </h:form>
+    </p:dialog>
+    
+    <script type="text/javascript">
+      function handleSavingData(xhr, status, args) {
+        var openStatus = $('#frm1\\:open-status').find("span").hasClass("ui-icon-check");
+        if (args.validationFailed || !args.updateStatus) {
+          //PF('addNewReasonDlg').jq.effect("shake", {times:5}, 100);
+        } else if (!openStatus) {
+          PF('addNewReasonDlg').hide();
+        }
+      }
+      function handleUpdatingData(xhr, status, args) {
+        //var openStatus = $('#frm2\\:open-status-2').find("span").hasClass("ui-icon-check");
+        if (args.validationFailed || !args.updateStatus) {
+          //PF('editReasonDlg').jq.effect("shake", {times:5}, 100);
+        } else {
+          PF('editReasonDlg').hide();
+        }
+      }
+    </script>
+  </ui:define>
+</ui:composition>
+

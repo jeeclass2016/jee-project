@@ -1,0 +1,105 @@
+<ui:composition template="/include/etopup/layout-etopup-quanlytaikhoan.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui">
+
+
+  <ui:define name="lib-header">
+  </ui:define>
+  <ui:define name="content">
+    <h:form id="accountInfoSearchingForm">
+      <p:growl id="growl" showDetail="true" autoUpdate="true" globalOnly="true"/>
+      <table style="width: 100%; height: 100%">
+        <tbody>
+        <tr>
+          <td class="menu-left"><ui:insert>
+            <ui:include src="/include/etopup/menu-top-left-etopup-quanlytaikhoan.xhtml"/>
+          </ui:insert></td>
+          <td class="wr-main">
+            <div class="main">
+              <div class="top-bar-content">
+                <div class="origin">
+                  <a href="#{request.contextPath}/home/index.xhtml">Trang chủ</a>&#187;
+                  <a class="here">Quản lý tài khoản</a>&#187;
+                  <a class="here">Tra cứu thông tin tài khoản</a>
+                </div>
+              </div>
+
+              <p:panel styleClass="main-panel-content">
+                <p:fieldset id="searchFieldSetId" legend="Nhập thông tin" styleClass="searchFieldSet">
+                  <p:focus context="searchFieldSetId"/>
+                  <p:panelGrid columns="3" styleClass="searchCriteriaGrid"
+                               columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label, searchCriteriaGrid-label, searchCriteriaGrid-input">
+                    <p:outputLabel value="Số thuê bao">
+                      <p:outputLabel value="*" styleClass="red-star"/>
+                    </p:outputLabel>
+                    <p:inputText id="msisdn" styleClass="commonInputText" required="true"
+                                 label="Số thuê bao"
+                                 value="#{accountInfoSearchingEtopupController.accountInfoSearchingDTO.msisdn}">
+                      <o:validator validatorId="requiredContentValidator"/>
+                      <o:validator validatorId="phoneValidator"/>
+                    </p:inputText>
+
+                    <p:commandButton id="searchBtn"
+                                     value="Lấy thông tin"
+                                     styleClass="commonButton"
+                                     onclick="PF('blockEntirePage').show()"
+                                     oncomplete="PF('blockEntirePage').hide()"
+                                     update=":accountInfoSearchingForm:growl accountInfoFieldSetId searchFieldSetId"
+                                     actionListener="#{accountInfoSearchingEtopupController.findAccountInfo}"/>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message id="messageForMsisdn" for="msisdn" escape="false"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                  </p:panelGrid>
+
+                </p:fieldset>
+
+                <p:fieldset id="accountInfoFieldSetId" legend="Chi tiết thông tin tài khoản" styleClass="resultFieldSet">
+                  <p:panelGrid columns="5" styleClass="resultGrid"
+                               columnClasses="resultGrid-label, resultGrid-input, resultGrid-label, resultGrid-label, resultGrid-input">
+                    <p:outputLabel value="Mã đại lý"/>
+                    <p:inputText id="agentId" styleClass="commonInputText" disabled="true"
+                                 value="#{accountInfoSearchingEtopupController.agentAccount.agent.agentId}"/>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+
+                    <p:outputLabel value="Số dư thực"/>
+                    <p:inputText id="realBalance" styleClass="commonInputText" disabled="true"
+                                 value="#{accountInfoSearchingEtopupController.agentAccount.realBalance}"/>
+
+                    <p:outputLabel value="Ngày tạo"/>
+                    <p:calendar value="#{accountInfoSearchingEtopupController.agentAccount.createDate}"
+                                pattern="dd/MM/yyyy" disabled="true" styleClass="commonCalendarTextInput"/>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+
+                    <p:outputLabel value="Số dư hiện tại"/>
+                    <p:inputText id="currentBalance" styleClass="commonInputText" disabled="true"
+                                 value="#{accountInfoSearchingEtopupController.agentAccount.currBalance}"/>
+
+                    <p:outputLabel value="Ngày mở"/>
+                    <p:calendar value="#{accountInfoSearchingEtopupController.agentAccount.openDate}"
+                                pattern="dd/MM/yyyy" disabled="true" styleClass="commonCalendarTextInput"/>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+
+                    <p:outputLabel value="Giới hạn nhỏ nhất"/>
+                    <p:inputText id="threshold" styleClass="commonInputText" disabled="true"
+                                 value="#{accountInfoSearchingEtopupController.agentAccount.threshold}"/>
+                  </p:panelGrid>
+                </p:fieldset>
+              </p:panel>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </h:form>
+  </ui:define>
+
+</ui:composition>
+

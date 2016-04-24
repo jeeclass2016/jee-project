@@ -1,0 +1,30 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+  <div class="main-menu-left">
+    <ul id="menu1" class="menu-left-not-collapse">
+      <li>
+        <a class="menuitem">
+          <i class="icon-categories"/>
+          Danh mục
+          <i class="icon-categories-right"/>
+        </a>
+        <ul class="michael">
+          <li><a href="#{request.contextPath}/etopup/danh-muc/DanhMucTrungTam.xhtml">Danh mục trung tâm</a></li>
+          <li><a href="#{request.contextPath}/etopup/danh-muc/DanhMucLyDo.xhtml">Danh mục lý do</a></li>
+          <li><a href="#{request.contextPath}/etopup/danh-muc/DanhMucGiaoDich.xhtml">Danh mục giao dịch</a></li>
+          <li><a
+            href="#{request.contextPath}/etopup/danh-muc/DanhMucChuongTrinhKhuyenMai.xhtml">Danh mục chương trình khuyến mại</a>
+          </li>
+          <li><a
+            href="#{request.contextPath}/etopup/danh-muc/MapNguoiSuDungVaDaiLy.xhtml">Map người sử dụng và đại lý</a>
+          </li>
+          <li><a href="#{request.contextPath}/etopup/danh-muc/MapDaiLyVaKho.xhtml">Map đại lý và kho</a></li>
+          <li><a href="#{request.contextPath}/etopup/danh-muc/MapDaiLyVaKhoTheoLo.xhtml">Map đại lý và kho theo lô</a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</ui:composition>

@@ -1,0 +1,198 @@
+<ui:composition template="/include/etopup/layout-etopup-danhmuc.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+
+  <ui:define name="lib-header">
+  </ui:define>
+  <ui:define name="content">
+    <p:growl id="growl" showDetail="true" autoUpdate="true" globalOnly="true"/>
+    <table style="width: 100%; height: 100%">
+      <tbody>
+      <tr>
+        <td class="menu-left"><ui:insert>
+          <ui:include src="/include/etopup/menu-top-left-etopup-danhmuc.xhtml"/>
+        </ui:insert></td>
+        <td class="wr-main">
+          <div class="main">
+            <div class="top-bar-content">
+              <div class="origin">
+                <a href="#{request.contextPath}/home/index.xhtml">Trang chủ</a>&#187;
+                <a class="here">Danh mục</a>&#187;
+                <a class="here">Map người sử dụng và đại lý</a>
+              </div>
+            </div>
+
+            <p:panel styleClass="main-panel-content">
+              <h:form id="userSearchingForm">
+                <p:fieldset id="userDetailsFieldSet" legend="Tìm kiếm người sử dụng" styleClass="searchFieldSet">
+                  <p:focus context="userDetailsFieldSet"/>
+                  <p:panelGrid columns="3" styleClass="searchCriteriaGrid"
+                               columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label">
+
+                    <p:outputLabel value="Tên NSD">
+                      <p:outputLabel value="*" styleClass="red-star"/>
+                    </p:outputLabel>
+                    <p:inputText id="userName"
+                                 label="Tên NSD"
+                                 style="margin-left:15px;width:300px"
+                                 required="true"
+                                 value="#{mapUserAndAgentController.userManagementDTO.userName}">
+                      <f:validator validatorId="nameValidator"/>
+                    </p:inputText>
+                    <p:commandButton id="timNSDBtn"
+                                     value="Tìm NSD"
+                                     styleClass="commonButton"
+                                     onclick="PF('blockEntirePage').show()"
+                                     oncomplete="PF('blockEntirePage').hide()"
+                                     update=":userSearchingForm:userDetailsFieldSet, :agentSearchingForm:agentDetailsFieldSet, :userAgentMapListForm:danhSachDaiLyTuongUngFieldSet, :userSearchingForm:messageForUserName"
+                                     actionListener="#{mapUserAndAgentController.doFindUserProfile}">
+                    </p:commandButton>                 
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message id="messageForUserName" for="userName"/>
+
+                  </p:panelGrid>
+
+                  <p:panelGrid columns="5" styleClass="searchCriteriaGrid" id="userProfilePg"
+                               style="margin-top:20px; margin-bottom:20px;"
+                               columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label,searchCriteriaGrid-label, searchCriteriaGrid-input">
+                    <p:outputLabel value="Họ và tên"/>
+                    <p:inputText id="fullName"
+                                 disabled="true"
+                                 styleClass="commonInputText"
+                                 value="#{mapUserAndAgentController.userDTO.fullName}"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Địa chỉ"/>
+                    <p:inputText id="address"
+                                 disabled="true"
+                                 styleClass="commonInputText"
+                                 value="#{mapUserAndAgentController.userDTO.address}"/>
+                  </p:panelGrid>
+                </p:fieldset>
+              </h:form>
+
+              <h:form id="agentSearchingForm">
+                <p:fieldset id="agentDetailsFieldSet" legend="Tìm kiếm đại lý Eload" styleClass="searchFieldSet">
+                  <p:panelGrid columns="3" style="border: none" styleClass="searchCriteriaGrid"
+                               columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label">
+                    <p:outputLabel value="Số thuê bao">
+                      <p:outputLabel value="*" styleClass="red-star"/>
+                    </p:outputLabel>
+                    <p:inputText id="msisdn"
+                                 style="width:300px"
+                                 label="Số thuê bao"
+                                 required="true"
+                                 value="#{mapUserAndAgentController.agentManagementDTO.msisdn}">
+                      <f:validator validatorId="requiredContentValidator"/>
+                      <f:validator validatorId="phoneValidator"/>
+                    </p:inputText>
+                    <p:commandButton id="timDaiLyBtn"
+                                     value="Tìm đại lý"
+                                     disabled="#{not mapUserAndAgentController.enableFindingAgent}"
+                                     styleClass="commonButton"
+                                     onclick="PF('blockEntirePage').show()"
+                                     oncomplete="PF('blockEntirePage').hide()"
+                                     update=":agentSearchingForm:agentDetailsFieldSet"
+                                     validateClient="true"
+                                     actionListener="#{mapUserAndAgentController.doFindAgent}" >
+                    </p:commandButton>                 
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message id="messageForMsisdn" for="msisdn"/>
+
+                  </p:panelGrid>
+                  <p:panelGrid columns="5" styleClass="searchCriteriaGrid"
+                               style="margin-top:20px; margin-bottom:20px"
+                               columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label,searchCriteriaGrid-label, searchCriteriaGrid-input">
+                    <p:outputLabel value="Tên thương mại"/>
+                    <p:inputText id="tradeName" styleClass="commonInputText"
+                                 disabled="true"
+                                 value="#{mapUserAndAgentController.newMappedAgent.tradeName}"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="Chủ sở hữu"/>
+                    <p:inputText id="ownerName" styleClass="commonInputText"
+                                 disabled="true"
+                                 value="#{mapUserAndAgentController.newMappedAgent.ownerName}"/>
+
+                    <p:outputLabel value="Mã đại lý"/>
+                    <p:inputText id="sapCode" styleClass="commonInputText"
+                                 disabled="true"
+                                 value="#{mapUserAndAgentController.newMappedAgent.sapCode}"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel value="ICCID"/>
+                    <p:inputText id="iccid" styleClass="commonInputText"
+                                 disabled="true"
+                                 value="#{mapUserAndAgentController.newMappedAgent.iccid}"/>
+                  </p:panelGrid>
+
+                  <p:panelGrid columns="1" styleClass="searchCriteriaGrid" style="margin-top:20px">
+                    <p:commandButton value="Chấp nhận"
+                                     styleClass="commonButton"
+                                     disabled="#{not mapUserAndAgentController.enableCreatingMap}"
+                                     onclick="PF('blockEntirePage').show();"
+                                     oncomplete="PF('blockEntirePage').hide()"
+                                     update=":userAgentMapListForm:danhSachDaiLyTuongUngFieldSet"
+                                     actionListener="#{mapUserAndAgentController.doMapAgentWithUser}"/>
+                  </p:panelGrid>
+
+                </p:fieldset>
+              </h:form>
+
+              <h:form id="userAgentMapListForm">
+                <p:fieldset id="danhSachDaiLyTuongUngFieldSet" legend="Danh sách đại lý Eload trực thuộc NSD"
+                            styleClass="resultFieldSet">
+                  <p:dataTable styleClass="table-list ft-left p-data-table resultDataTable"
+                               paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                               paginator="true"
+                               rows="15"
+                               rowKey="#{agent}"
+                               paginatorPosition="bottom"
+                               selectionMode="single"
+                               value="#{mapUserAndAgentController.listAgentsMapToUser}"
+                               emptyMessage="Không có bản ghi nào"
+                               var="agent">
+
+                    <p:column headerText="MsIsdn" width="150">
+                      <p:outputLabel value="#{agent.msisdn}"/>
+                    </p:column>
+                    <p:column headerText="IccId" width="150">
+                      <p:outputLabel value="#{agent.iccid}"/>
+                    </p:column>
+                    <p:column headerText="Mã đại lý">
+                      <p:outputLabel value="#{agent.sapCode}"/>
+                    </p:column>
+                    <p:column headerText="Tên thương mại">
+                      <p:outputLabel value="#{agent.tradeName}"/>
+                    </p:column>
+                    <p:column headerText="Chủ sở hữu" sortBy="#{agent.ownerName}">
+                      <p:outputLabel value="#{agent.ownerName}"/>
+                    </p:column>
+
+                    <p:column width="50">
+
+                      <p:commandLink title="Xóa" styleClass="bt-delete-2"
+                                     actionListener="#{mapUserAndAgentController.deleteMappedAgent(agent)}"
+                                     onclick="PF('blockEntirePage').show();"
+                                     oncomplete="PF('blockEntirePage').hide()"
+                                     update=":userAgentMapListForm:danhSachDaiLyTuongUngFieldSet">
+                        <p:confirm header="Confirmation" message="Bạn có muốn Xóa?" icon="ui-icon-alert"/>
+                      </p:commandLink>
+
+                    </p:column>
+                  </p:dataTable>
+                </p:fieldset>
+              </h:form>
+            </p:panel>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+  </ui:define>
+
+</ui:composition>

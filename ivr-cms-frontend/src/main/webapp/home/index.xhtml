@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<meta charset="utf-8" />
+	<link rel="shortcut icon"
+		href="#{request.contextPath}/content/images/favicon.png" />
+	<title>CMS</title>
+	<link rel="stylesheet"
+		href="#{request.contextPath}/content/css/style.css" />
+	<link rel="stylesheet"
+		href="#{request.contextPath}/content/css/reset.css" />
+
+</h:head>
+
+<h:body>
+	<div class="logo-home-block">
+		<img src="#{request.contextPath}/content/images/logo-epos.png"
+			width="120" height="120" alt="CMS" />
+		<h1>CMS</h1>
+	</div>
+
+	<div class="user-header-home">
+		<h:form>
+			<a href="#" class="question"><img
+				src="#{request.contextPath}/content/images/question.png" width="25"
+				height="25" alt="CMS" /></a>
+			<h:commandLink styleClass="log-out" value="Đăng xuất"
+				action="#{auth.logout}"></h:commandLink>
+			<a href="#" class="user-name-header"><h:outputText
+					value="#{auth.member.fullName}" /> </a>
+		</h:form>
+	</div>
+
+	<div class="wr-home">
+		<div class="inner">
+			<a href="#{request.contextPath}/include/layout.xhtml"
+				class="page-box warehouse">
+				<div class="title-page-box">Service Management</div>
+			</a>
+			
+			<a href="#{request.contextPath}/etopup/danh-muc/DanhMucTrungTam.xhtml" class="page-box etopup">
+				<div class="title-page-box">Content Management</div>
+			</a> 
+			<a href="#" class="page-box admin">
+				<div class="title-page-box">Report</div>
+			</a> 
+			<a href="#" class="page-box settings">
+				<div class="title-page-box">Monitor</div>
+			</a>
+		</div>
+	</div>
+
+</h:body>
+</html>

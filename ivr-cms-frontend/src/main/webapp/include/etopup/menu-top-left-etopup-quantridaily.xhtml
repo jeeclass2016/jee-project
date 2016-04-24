@@ -1,0 +1,41 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+  <div class="main-menu-left">
+    <ul id="menu1" class="menu-left-not-collapse">
+
+      <li>
+        <a class="collapsed menuitem">
+          <i class="icon-categories"/>
+          Quản trị đại lý
+          <i class="icon-categories-right"/>
+        </a>
+        <ul class="michael">
+          <li><a href="#{request.contextPath}/etopup/quan-tri-dai-ly/UploadSIMTheoLo.xhtml">Upload SIM theo lô</a></li>
+          <li><a href="#{request.contextPath}/etopup/quan-tri-dai-ly/UploadDaiLyTheoLo.xhtml">Upload đại lý theo lô</a>
+          </li>
+          <li><a href="#{request.contextPath}/etopup/quan-tri-dai-ly/ResetMatKhau.xhtml">Reset mật khẩu</a></li>
+          <li><a href="#{request.contextPath}/etopup/quan-tri-dai-ly/QuanTriDaiLy.xhtml">Quản trị đại lý</a>
+          </li>
+          <li><a
+            href="#{request.contextPath}/etopup/quan-tri-dai-ly/DoiCapThongTinICCID-MSISDN.xhtml">Đổi cặp thông tin ICCID-MSISDN</a>
+          </li>
+          <li><a href="#{request.contextPath}/etopup/quan-tri-dai-ly/DoiThongTinICCID.xhtml">Đổi thông tin ICCID</a>
+          </li>
+          <li><a href="#{request.contextPath}/etopup/quan-tri-dai-ly/XoaDaiICCID.xhtml">Xóa dải ICCID</a></li>
+          <li><a
+            href="#{request.contextPath}/etopup/quan-tri-dai-ly/TraCuuThayDoiThongTinDaiLy.xhtml">Tra cứu thay đổi thông tin đại lý</a>
+          </li>
+          <li><a
+            href="#{request.contextPath}/etopup/quan-tri-dai-ly/GanDiaBanHoatDongChoDaiLyTheoLo.xhtml">Gán địa bàn hoạt động cho đại lý theo lô</a>
+          </li>
+          <li><a
+            href="#{request.contextPath}/etopup/quan-tri-dai-ly/QuanLyDiaBanHoatDongCuaDaiLy.xhtml">Quản lý địa bàn hoạt động của đại lý</a>
+          </li>
+        </ul>
+      </li>
+
+    </ul>
+  </div>
+</ui:composition>

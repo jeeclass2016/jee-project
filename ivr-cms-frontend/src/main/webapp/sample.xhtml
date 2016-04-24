@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+  <title>Xem thong tin kho</title>
+  <link rel="stylesheet" type="text/css" href="#{request.contextPath}/content/css/reset.css" />
+  <link rel="stylesheet" type="text/css" href="#{request.contextPath}/content/css/style.css" />
+  <link rel="stylesheet" type="text/css" href="#{request.contextPath}/content/css/epoch_styles.css" />
+</h:head>
+
+<h:body>
+    <h:form id="myform">
+      <p:growl id="growl" showDetail="true" />
+      <p:commandButton value="Select Car" icon="ui-icon-extlink"
+        actionListener="#{sampleController.chooseGoods}">
+        <p:ajax event="dialogReturn" listener="#{sampleController.onGoodsChosen}" update="myform:goods-name"/>
+      </p:commandButton>
+      
+      <p:inputText id="goods-name" value="#{sampleController.selectedGoods.name}"></p:inputText>
+      
+      <br/>
+      <p:commandButton value="Download as XLS" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop)">
+          <p:fileDownload value="#{sampleController.downloadFile}"></p:fileDownload>
+      </p:commandButton>
+      <p:dialog modal="true" widgetVar="statusDialog" header="Status" draggable="false" closable="false" resizable="false">
+        <p:graphicImage value="/content/images/ajaxloadingbar.gif" />
+      </p:dialog>
+      
+      <p:hotkey bind="f9" actionListener="#{sampleController.chooseGoods}"/>
+    </h:form>
+    <script>
+    var start = function() {
+      PF('statusDialog').show();  
+    }
+    var stop = function() {
+      PF('statusDialog').hide();  
+    }
+    
+    </script>
+</h:body>
+
+</html>

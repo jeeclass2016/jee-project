@@ -1,0 +1,171 @@
+<ui:composition template="/include/etopup/layout-etopup-quanlytaikhoan.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+
+  <ui:define name="lib-header">
+  </ui:define>
+  <ui:define name="content">
+    <h:form id="frm">
+      <p:hotkey bind="f9"/>
+      <table style="width: 100%; height: 100%">
+        <tbody>
+        <tr>
+          <td class="menu-left"><ui:insert>
+            <ui:include src="/include/etopup/menu-top-left-etopup-quanlytaikhoan.xhtml"/>
+          </ui:insert></td>
+          <td class="wr-main">
+            <div class="main">
+              <div class="top-bar-content">
+                <div class="origin">
+                  <a href="#{request.contextPath}/home/index.xhtml">Trang chủ</a>&#187;
+                  <a class="here">Quản lý tài khoản</a>&#187;
+                  <a class="here">Tra cứu giao dịch</a>&#187;
+                  <a class="here">Tìm theo số thuê bao</a>
+                </div>
+              </div>
+              <p:panel styleClass="main-panel-content">
+              		<p:fieldset id="searchFieldSetId" legend="Tìm kiếm" styleClass="searchFieldSet">
+	                  <p:focus context="searchFieldSetId"/>
+	                  <p:panelGrid columns="5" styleClass="searchCriteriaGrid"
+                               columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label, searchCriteriaGrid-label, searchCriteriaGrid-input">
+	                    <p:outputLabel value="Số gửi"/>
+	                    <p:inputText id="phoneNumber"
+	                                 value="#{transactionManagementController.transactionManagementDTO.msisdnSent}"/>
+	                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+	                    <p:outputLabel value="Số nhận"/>
+	                    <p:inputText id="agentName"
+	                                 value="#{transactionManagementController.transactionManagementDTO.msisdnReceived}"/>
+	
+	                    <p:outputLabel value="Từ ngày"/>
+	                    <p:calendar id="startDate"
+	                                showButtonPanel="true"
+	                                navigator="true"
+	                                value="#{transactionManagementController.transactionManagementDTO.startDate}"
+	                                mode="popup"
+	                                pattern="dd/MM/yyyy"
+	                                placeholder="Click để chọn ngày..."/>
+	                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+	                    <p:outputLabel value="Đến ngày"/>
+	                    <p:calendar id="endDate"
+	                                showButtonPanel="true"
+	                                navigator="true"
+	                                value="#{transactionManagementController.transactionManagementDTO.endDate}"
+	                                mode="popup"
+	                                pattern="dd/MM/yyyy"
+	                                placeholder="Click để chọn ngày..."/>
+	                  </p:panelGrid>
+	                  <p:panelGrid columns="1" styleClass="searchCriteriaGrid" style="margin-top:10px">
+	                    <p:commandButton value="Tìm kiếm"
+		                  				 actionListener="#{transactionManagementController.findTransactionByMSISDNs}"
+		                  				 update="resultListFieldSet :frm:transInfoFieldSet"
+		                                 onclick="PF('blockEntirePage').show();resultListWidget.getPaginator().setPage(0);"
+		                                 oncomplete="PF('blockEntirePage').hide()"    
+		                                 styleClass="commonButton" >
+		                </p:commandButton>
+	                  </p:panelGrid>
+                	</p:fieldset>
+	                <p:fieldset id="resultListFieldSet" legend="Danh sách giao dịch" styleClass="resultFieldSet">
+	                  <p:dataTable styleClass="table-list ft-left resultDataTable" 
+	                               paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+	                               paginator="true"
+	                               rows="15"
+	                               rowKey="#{r.transId}"
+	                               widgetVar="resultListWidget"
+	                               paginatorPosition="bottom"
+	                               resizableColumns="true"
+	                               emptyMessage="Không có bản ghi nào"
+	                               selectionMode="single" selection="#{transactionManagementController.selectedTransaction2}"
+	                               value="#{transactionManagementController.transactionLazyDataModel}"
+	                               lazy="true"
+	                               var="r">
+	
+	                    <p:ajax event="rowSelect" listener="#{transactionManagementController.onSelectRowListener2}"
+	                           update=":frm:transInfoFieldSet" />
+	
+	                    <p:column headerText="Mã giao dịch">
+	                      <h:outputText value="#{r.transId}"/>
+	                    </p:column>
+	                    <p:column headerText="Loại giao dịch">
+	                      <h:outputText value="#{r.transType}"/>
+	                    </p:column>
+	                    <p:column headerText="Ngày tạo">
+	                      <h:outputText value="#{r.createDate}">
+                            <f:convertDateTime pattern="dd-MM-yyyy" timeZone="#{transactionManagementController.currentTimeZone}" />
+                          </h:outputText>
+	                    </p:column>
+	                    <p:column headerText="Ngày thay đổi cuối">
+	                      <h:outputText value="#{r.lastModified}">
+	                      	<f:convertDateTime pattern="dd-MM-yyyy" timeZone="#{transactionManagementController.currentTimeZone}" />
+	                      </h:outputText>
+	                    </p:column>
+	                    <p:column headerText="Số gửi">
+	                      <h:outputText value="#{r.sourceMsisdn}"/>
+	                    </p:column>
+	                    <p:column headerText="Số nhận">
+	                      <h:outputText value="#{r.targetMsisdn}"/>
+	                    </p:column>
+	                    <p:column headerText="Tài khoản số gửi">
+	                      <h:outputText value="#{r.sourceAfTransBalance}"/>
+	                    </p:column>
+	                    <p:column headerText="Tài khoản số nhận">
+	                      <h:outputText value="#{r.targetAfTransBalance}"/>
+	                    </p:column>
+	                    <p:column headerText="Lượng tiền chuyển">
+	                      <h:outputText value="#{r.transAmount}"/>
+	                    </p:column>
+	                  </p:dataTable>
+	                </p:fieldset>
+	                <p:fieldset id="transInfoFieldSet" legend="Chi tiết giao dịch" styleClass="resultFieldSet">
+					  <p:dataTable styleClass="table-list ft-left resultDataTable" 
+	                               paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+	                               paginator="true"
+	                               rows="15"
+	                               rowKey="#{r.logId}"
+	                               paginatorPosition="bottom"
+	                               resizableColumns="true"
+	                               emptyMessage="Không có bản ghi nào"
+	                               value="#{transactionManagementController.transactionLogDataModel2}"
+	                               var="r">
+	                    <p:column headerText="Mã log">
+	                      <p:outputLabel value="#{r.logId}"/>
+	                    </p:column>
+	                    <p:column headerText="Ngày ghi log">
+	                      <p:outputLabel value="#{r.logDatetime}">
+	                      	<f:convertDateTime pattern="dd-MM-yyyy" timeZone="#{transactionManagementController.currentTimeZone}" />
+                          </p:outputLabel>
+	                    </p:column>
+	                    <p:column headerText="Mã kết quả">
+	                      <p:outputLabel value="#{r.resultCode}" />
+	                    </p:column>
+	                    <p:column headerText="Trạng thái">
+	                      <p:outputLabel value="#{r.recordStatus}" />
+	                    </p:column>
+	                    <p:column headerText="Thông tin">
+	                      <p:outputLabel value="#{r.data}"/>
+	                    </p:column>
+	                    <p:column headerText="Kênh">
+	                      <p:outputLabel value="#{transactionManagementController.showTransLogChannel(r)}"/>
+	                    </p:column>
+	                    <p:column headerText="Lỗi">
+	                      <p:outputLabel value=""/>
+	                    </p:column>
+	                    <p:column headerText="Từ khóa">
+	                      <p:outputLabel value="#{r.keyword}"/>
+	                    </p:column>
+	                  </p:dataTable>
+	                </p:fieldset>
+              </p:panel>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </h:form>
+  </ui:define>
+
+</ui:composition>
+

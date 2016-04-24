@@ -1,0 +1,28 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+  <div class="main-menu-left">
+    <ul id="menu1" class="menu-left-not-collapse">
+      <li>
+        <a class="menuitem">
+          <i class="icon-categories"/>
+          Quản lý SHT
+          <i class="icon-categories-right"/>
+        </a>
+        <ul class="michael">
+          <li><a
+            href="#{request.contextPath}/etopup/quan-ly-SHT/TraCuuTrangThaiNhanHoaHong.xhtml">Tra cứu trạng thái nhận hoa hồng</a>
+          </li>
+          <li><a
+            href="#{request.contextPath}/etopup/quan-ly-SHT/TraCuuGiaoDichEtopup.xhtml">Tra cứu giao dịch ETOPUP</a>
+          </li>
+          <li><a
+            href="#{request.contextPath}/etopup/quan-ly-SHT/TraCuuGiaoDichMPOS.xhtml">Tra cứu giao dịch MPOS</a>
+          </li>
+        </ul>
+      </li>
+
+    </ul>
+  </div>
+</ui:composition>

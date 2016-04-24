@@ -1,0 +1,266 @@
+<ui:composition template="/include/etopup/layout-etopup-danhmuc.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+  <ui:define name="lib-header">
+  </ui:define>
+  <ui:define name="content">
+    <h:form id="frmTransaction">
+
+      <p:hotkey bind="f9"/>
+      <p:growl id="growl" showDetail="true" autoUpdate="true" globalOnly="true"/>
+      <table style="width: 100%; height: 100%">
+        <tbody>
+        <tr>
+          <td class="menu-left"><ui:insert>
+            <ui:include src="/include/etopup/menu-top-left-etopup-danhmuc.xhtml"/>
+          </ui:insert></td>
+          <td class="wr-main">
+            <div class="main">
+              <div class="top-bar-content">
+                <div class="origin">
+                  <a href="#{request.contextPath}/home/index.xhtml">Trang chủ</a>&#187;
+                  <a class="here">Danh mục</a>&#187;
+                  <a class="here">Danh mục giao dịch</a>
+                </div>
+              </div>
+              <p:panel id="searchPanel" styleClass="main-panel-content">
+                <p:focus context="searchPanel"/>
+                <p:fieldset legend="Thông tin tìm kiếm" styleClass="searchFieldSet">
+                  <p:messages id="status-messages"/>
+
+                  <div class="searchCriteriaGrid-wrapper-div">
+                    <p:panelGrid styleClass="searchCriteriaGrid"
+                                 columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label, searchCriteriaGrid-input">
+                      <p:row>
+                        <p:column styleClass="searchCriteriaGrid-label">
+                          <p:outputLabel value="Mã GD"/>
+                        </p:column>
+                        <p:column styleClass="searchCriteriaGrid-input">
+                          <p:inputText value="#{transactionTypeController.code}" maxlength="10"
+                                       styleClass="search-staff"/>
+                        </p:column>
+                        <p:column styleClass="searchCriteriaGrid-label">
+                          <p:outputLabel value="Mô tả"/>
+                        </p:column>
+                        <p:column styleClass="searchCriteriaGrid-input">
+                          <p:inputText value="#{transactionTypeController.description}" maxlength="200"
+                                       styleClass="search-staff"/>
+                        </p:column>
+                      </p:row>
+                      <p:row>
+                        <p:column styleClass="searchCriteriaGrid-label">
+                          <p:outputLabel value="Trạng thái"/>
+                        </p:column>
+                        <p:column styleClass="searchCriteriaGrid-input">
+                          <p:selectOneMenu value="#{transactionTypeController.status}" styleClass="select-bill">
+                            <f:selectItem itemLabel="Tất cả" itemValue=""/>
+                            <f:selectItems value="#{transactionTypeController.listStatus}"/>
+                          </p:selectOneMenu>
+                        </p:column>
+                      </p:row>
+                    </p:panelGrid>
+                    <p:panelGrid columns="1" styleClass="searchCriteriaGrid" style="margin-top:10px">
+                      <p:commandButton styleClass="commonButton" value="Tìm kiếm"
+                                       onclick="dataGridWidget.getPaginator().setPage(0);"
+                                       update=":frmTransaction:list-transaction, :frmTransaction:status-messages"
+                                       actionListener="#{transactionTypeController.onFindTransType}">
+                      </p:commandButton>
+                    </p:panelGrid>
+                  </div>
+                </p:fieldset>
+
+                <p:fieldset legend="Danh sách GD" styleClass="resultFieldSet">
+                  <p:commandButton id="modalDialogButton" value="Thêm"
+                                   actionListener="#{transactionTypeController.openAddTransType}"
+                                   process="@this" update=":frmTransaction2:modalDialog" oncomplete="dlg2.show();"
+                                   styleClass="commonButton"
+                                   style="margin-bottom:15px; margin-left:15px;">
+                    <p:resetInput target=":frmTransaction2:modalDialog"/>
+                  </p:commandButton>
+
+                  <p:dataTable styleClass="table-list ft-left resultDataTable"
+                               columnClasses="col-5,col-20,col-10,col-10,col-10,col-10,col-15,col-10"
+                               id="list-transaction"
+                               value="#{transactionTypeController.transactionTypesLazyDataModel}"
+                               var="item" paginator="true"
+                               rows="#{transactionTypeController.totalPage}"
+                               selectionMode="single"
+                               resizableColumns="true"
+                               paginatorPosition="bottom"
+                               paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                               rowsPerPageTemplate="15,50,100"
+                               lazy="true"
+                               widgetVar="dataGridWidget"
+                               emptyMessage="Không có bản ghi nào.">
+
+                    <p:column sortBy="code" headerText="Mã GD" width="120">
+                      <h:outputText value="#{item.code}"></h:outputText>
+                    </p:column>
+                    <p:column sortBy="description" headerText="Mô tả">
+                      <h:outputText value="#{item.description}"></h:outputText>
+                    </p:column>
+                    <p:column headerText="Trạng thái" width="120">
+                      <h:outputText value="#{transactionTypeController.getStatusLabel(item.status)}"/>
+                    </p:column>
+                    <p:column width="60">
+                      <p:commandLink title="Chỉnh sửa" styleClass="bt-edit" id="lnk-edit-transType"
+                                     actionListener="#{transactionTypeController.editTransType(item.id)}"
+                                     process="@this" update=":frmTransaction3:modalDialog3" oncomplete="dlg3.show();">
+                        <p:resetInput target=":frmTransaction2:modalDialog"/>
+                      </p:commandLink>
+                      <p:commandLink title="Xóa" styleClass="bt-delete-2"
+                                     actionListener="#{transactionTypeController.openDeleteConfirmDialog(item.id)}"
+                                     oncomplete="PF('confirm-delete-dialog').show();"/>
+                    </p:column>
+                  </p:dataTable>
+                </p:fieldset>
+              </p:panel>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </h:form>
+
+    <h:form id="frmTransaction2">
+      <p:dialog id="modalDialog" header="Thêm mới giao dịch" widgetVar="dlg2" modal="true"
+                width="600" resizable="false">
+        <p:fieldset legend="Thông tin" styleClass="addFieldSet">
+          <!-- <p:messages autoUpdate="true" id="messages"/>   -->
+          <p:panelGrid id="edit-form" columns="2" style="border: none" styleClass="searchCriteriaGrid"
+          	columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input">
+            <p:outputLabel value="Mã GD">
+              <span class="red-star" style="margin: 0">*</span>
+            </p:outputLabel>
+            <p:inputText id="add-form-code" label="Mã GD" maxlength="10"
+                         value="#{transactionTypeController.newCode}"
+                         required="true" placeholder="Nhập mã kiểu giao dịch" styleClass="search-staff">
+              <!-- <f:validateLength maximum="6"/> -->
+              <f:validator validatorId="etopupTransTypeCodeValidator"/>
+            </p:inputText>
+            <p:outputLabel/>
+            <p:message for="add-form-code"/>
+            <p:outputLabel value="Mô tả"><span class="red-star" style="margin: 0">*</span></p:outputLabel>
+            <p:inputText id="description" label="Mô tả" required="true" styleClass="search-staff"
+                         placeholder="Nhập mô tả kiểu giao dịch" maxlength="250"
+                         value="#{transactionTypeController.newDescription}">
+              <f:validateLength maximum="200"/>
+              <f:validator validatorId="etopupTransTypeDescriptionValidator"/>
+            </p:inputText>
+            <p:outputLabel/>
+            <p:message for="description"/>
+            <p:outputLabel value="Trạng thái"/>
+            <p:selectOneMenu label="Trạng thái" value="#{transactionTypeController.newStatus}"
+                             styleClass="select-bill" required="true">
+              <f:selectItems value="#{transactionTypeController.listStatus}"/>
+            </p:selectOneMenu>
+
+          </p:panelGrid>
+          <p:panelGrid columns="4" style="margin-top:20px" styleClass="searchCriteriaGrid">
+            <p:commandButton id="save" value="Chấp nhận" styleClass="commonButton"
+                             style="float:right" validateClient="true"
+                             actionListener="#{transactionTypeController.saveUpdateTransType}"
+                             update=":frmTransaction:list-transaction, :frmTransaction:growl, :frmTransaction2:edit-form"
+                             oncomplete="handleSavingData(xhr, status, args)"/>
+            <p:commandButton value="Thoát" styleClass="commonButton"
+                             onclick="PF('dlg2').hide();"/>
+            <input type="checkbox" id="open-status" style="float:left;" checked="checked"/>
+            <p:outputLabel value="Không ẩn popup"/>
+          </p:panelGrid>
+        </p:fieldset>
+      </p:dialog>
+    </h:form>
+
+    <h:form id="frmTransaction3">
+      <p:dialog id="modalDialog3" header="Chỉnh sửa giao dịch" widgetVar="dlg3" modal="true"
+                width="600" resizable="false">
+        <p:fieldset legend="Thông tin chỉnh sửa" styleClass="addFieldSet">
+          <!-- <p:messages autoUpdate="true" id="messages"/>   -->
+          <p:panelGrid id="edit-form" columns="2" style="border: none" styleClass="searchCriteriaGrid"
+          	columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input">
+            <p:outputLabel value="Mã GD">
+              <span class="red-star" style="margin: 0">*</span>
+            </p:outputLabel>
+            <p:inputText id="add-form-code" label="Mã GD" maxlength="10"
+                         value="#{transactionTypeController.newCode}"
+                         required="true" placeholder="Nhập mã kiểu giao dịch" styleClass="search-staff">
+              <!-- <f:validateLength maximum="6"/> -->
+              <f:validator validatorId="etopupTransTypeCodeValidator"/>
+            </p:inputText>
+            <p:outputLabel/>
+            <p:message for="add-form-code"/>
+            <p:outputLabel value="Mô tả"><span class="red-star" style="margin: 0">*</span></p:outputLabel>
+            <p:inputText id="description" label="Mô tả" required="true" styleClass="search-staff"
+                         placeholder="Nhập mô tả kiểu giao dịch" maxlength="250"
+                         value="#{transactionTypeController.newDescription}">
+              <f:validateLength maximum="200"/>
+              <f:validator validatorId="etopupTransTypeDescriptionValidator"/>
+            </p:inputText>
+            <p:outputLabel/>
+            <p:message for="description"/>
+            <p:outputLabel value="Trạng thái"/>
+            <p:selectOneMenu label="Trạng thái" value="#{transactionTypeController.newStatus}"
+                             styleClass="select-bill" required="true">
+              <f:selectItems value="#{transactionTypeController.listStatus}"/>
+            </p:selectOneMenu>
+          </p:panelGrid>
+          <p:panelGrid columns="2" style="margin-top:20px" styleClass="searchCriteriaGrid">
+            <p:commandButton id="save" value="Chấp nhận" styleClass="commonButton"
+                             style="float:right" validateClient="true"
+                             actionListener="#{transactionTypeController.saveUpdateTransType}"
+                             update=":frmTransaction:list-transaction, :frmTransaction:growl, :frmTransaction3:edit-form"
+                             oncomplete="handleUpdatingData(xhr, status, args)"/>
+            <p:commandButton value="Thoát" styleClass="commonButton"
+                             onclick="PF('dlg3').hide();"/>
+          </p:panelGrid>
+        </p:fieldset>
+      </p:dialog>
+    </h:form>
+
+    <p:dialog id="delete-comfirmation-dialog"
+              header="Xác nhận"
+              widgetVar="confirm-delete-dialog"
+              modal="true">
+      <h:form id="frmXacNhanXoaGiaoDich" prependId="false">
+        <p:panel styleClass="main-panel-content">
+          <p:panelGrid columns="1" styleClass="searchCriteriaGrid">
+            <p:outputLabel value="Bạn có muốn xoá giao dịch này không?"/>
+          </p:panelGrid>
+          <p:panelGrid columns="2" styleClass="searchCriteriaGrid" style="margin-top:20px">
+            <p:commandButton value="Có"
+                             style="margin-left: 40px"
+                             styleClass="commonButton"
+                             actionListener="#{transactionTypeController.deleteTransType}"
+                             oncomplete="PF('confirm-delete-dialog').hide();"
+                             update=":frmTransaction:list-transaction, :frmTransaction:growl"/>
+            <p:commandButton value="Không"
+                             style="margin-left: 5px"
+                             styleClass="commonButton"
+                             validateClient="true"
+                             onclick="PF('confirm-delete-dialog').hide();"/>
+          </p:panelGrid>
+        </p:panel>
+      </h:form>
+    </p:dialog>
+    <script type="text/javascript">
+      function handleSavingData(xhr, status, args) {
+        var openStatus = $('#open-status').prop('checked');
+        if (args.validationFailed || !args.updateStatus) {
+          //PF('dlg2').jq.effect("shake", {times:5}, 100);
+        } else if (!openStatus) {
+          dlg2.hide();
+        }
+      }
+      function handleUpdatingData(xhr, status, args) {
+        if (args.validationFailed || !args.updateStatus) {
+          //PF('dlg2').jq.effect("shake", {times:5}, 100);
+        } else {
+          dlg3.hide();
+        }
+      }
+    </script>
+  </ui:define>
+</ui:composition>

@@ -1,0 +1,163 @@
+<ui:composition template="/include/etopup/layout-etopup-quanlytaikhoan.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui">
+  <f:metadata>
+    <f:event type="preRenderView" listener="#{balanceAdjustmentBatchEtopupController.initReasonSelectItems}"/>
+  </f:metadata>
+
+    <ui:define name="lib-header">
+    </ui:define>
+    <ui:define name="content">
+        <h:form id="balanceAdjustmentBatchForm">
+            <p:growl id="growl" showDetail="true" autoUpdate="true" globalOnly="true"/>
+            <table style="width: 100%; height: 100%">
+                <tbody>
+                <tr>
+                    <td class="menu-left"><ui:insert>
+                        <ui:include src="/include/etopup/menu-top-left-etopup-quanlytaikhoan.xhtml"/>
+                    </ui:insert></td>
+                    <td class="wr-main">
+                        <div class="main">
+                            <div class="top-bar-content">
+                                <div class="origin">
+                                    <a href="#{request.contextPath}/home/index.xhtml">Trang chủ</a>&#187;
+                                    <a class="here">Quản lý tài khoản</a>&#187;
+                                    <a class="here">Điều chỉnh tài khoản theo lô</a>
+                                </div>
+                            </div>
+
+                            <p:panel styleClass="main-panel-content">
+                                <p:fieldset id="infoFieldSetId" legend="Thông tin" styleClass="searchFieldSet">
+                                    <p:focus context="infoFieldSetId"/>
+                                    <p:panelGrid styleClass="searchCriteriaGrid">
+                                        <p:row>
+                                            <p:column styleClass="searchCriteriaGrid-label">
+                                                <p:outputLabel value="Upload File">
+                                                    <p:outputLabel value="*" styleClass="red-star"/>
+                                                </p:outputLabel>
+                                            </p:column>
+                                            <p:column styleClass="searchCriteriaGrid-label">
+                                                <p:inputText readonly="true" styleClass="commonInputText" style="width:250px"
+                                                             id="balanceBatchUploadedFileName"
+                                                             value="#{balanceAdjustmentBatchEtopupController.uploadedFile.fileName}"/>
+                                            </p:column>
+                                            <p:column styleClass="searchCriteriaGrid-label">
+                                                <p:fileUpload fileUploadListener="${balanceAdjustmentBatchEtopupController.handleFileUpload}"
+                                                              id="selectFile"
+                                                              mode="advanced" dragDropSupport="false"
+                                                              sizeLimit="1000000" auto="true"
+                                                              allowTypes="/(\.|\/)(txt)$/"
+                                                              update="balanceBatchUploadedFileName"
+                                                              label="Chọn file" styleClass="fileUpload-onebutton">
+                                                </p:fileUpload>
+                                            </p:column>
+                                        </p:row>
+                                        <p:row>
+                                            <p:column styleClass="searchCriteriaGrid-label">
+                                                <p:outputLabel value="Loại điều chỉnh">
+                                                    <p:outputLabel value="*" styleClass="red-star"/>
+                                                </p:outputLabel>
+                                            </p:column>
+
+                                            <p:column colspan="4" styleClass="searchCriteriaGrid-input">
+                                                <p:selectOneMenu id="adjustmentType" required="true"
+                                                                 value="#{balanceAdjustmentBatchEtopupController.dto.adjustmentType}" style="width: 250px">
+                                                    <f:selectItems value="#{balanceAdjustmentBatchEtopupController.adjustmentTypeSelectItems}"/>
+                                                </p:selectOneMenu>
+                                            </p:column>
+
+                                            <p:column><p:outputLabel styleClass="emptySeperatorLabel"/></p:column>
+
+                                            <p:column styleClass="searchCriteriaGrid-label">
+                                                <p:outputLabel value="Lý do">
+                                                    <p:outputLabel value="*" styleClass="red-star"/>
+                                                </p:outputLabel>
+                                            </p:column>
+
+                                            <p:column styleClass="searchCriteriaGrid-input">
+                                                <p:selectOneMenu id="reason" required="true"
+                                                                 value="#{balanceAdjustmentBatchEtopupController.dto.reason}" style="width: 250px">
+                                                    <f:selectItems value="#{balanceAdjustmentBatchEtopupController.reasonSelectItems}"/>
+                                                </p:selectOneMenu>
+                                            </p:column>
+                                        </p:row>
+
+                                        <p:row>
+                                            <p:column styleClass="searchCriteriaGrid-label">
+                                                <p:outputLabel value="Số tham chiếu"/>
+                                            </p:column>
+
+                                            <p:column styleClass="searchCriteriaGrid-input">
+                                                <p:inputText id="referenceNumber" styleClass="commonInputText"
+                                                             value="#{balanceAdjustmentBatchEtopupController.dto.referenceNumber}"/>
+                                            </p:column>
+                                        </p:row>
+                                    </p:panelGrid>
+
+                                    <p:panelGrid styleClass="searchCriteriaGrid">
+                                        <p:row>
+                                            <p:column>
+                                                <p:commandButton id="adjustBtn"
+                                                                 value="Thực hiện"
+                                                                 styleClass="commonButton"
+                                                                 onclick="PF('blockEntirePage').show()"
+                                                                 oncomplete="PF('blockEntirePage').hide()"
+                                                                 update="adjustBalanceTableInfo :balanceAdjustmentBatchForm:growl downloadErrorFileBtn :balanceAdjustmentBatchForm:balanceBatchMessage"
+                                                                 actionListener="#{balanceAdjustmentBatchEtopupController.doUploadBalanceAdjustmentBatch}"
+                                                        />
+                                            </p:column>
+                                            <p:column>
+                                                <p:commandButton id="downloadErrorFileBtn" value="Download file lỗi"
+                                                                 styleClass="commonButton"
+                                                                 disabled="#{!balanceAdjustmentBatchEtopupController.uploadedFileError}" ajax="false"
+                                                                 update="selectFile">
+                                                    <p:fileDownload value="#{balanceAdjustmentBatchEtopupController.errorFile}"/>
+                                                </p:commandButton>
+                                            </p:column>
+                                        </p:row>
+                                    </p:panelGrid>
+                                    <p:panelGrid columns="1" styleClass="searchCriteriaGrid">
+                                        <p:messages id="balanceBatchMessage" globalOnly="false" autoUpdate="false" />
+                                    </p:panelGrid>
+                                </p:fieldset>
+                                <p:fieldset id="infoFile" legend="Thông tin file" styleClass="resultFieldSet">
+                                    <p:dataTable styleClass="table-list ft-left resultDataTable"
+                                                 id="adjustBalanceTableInfo"
+                                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                 paginator="true"
+                                                 rows="5"
+                                                 lazy="true"
+                                                 emptyMessage="Không có bản ghi nào."
+                                                 paginatorPosition="bottom"
+                                                 resizableColumns="true"
+                                                 selectionMode="single"
+                                                 value="#{balanceAdjustmentBatchEtopupController.dataModel}"
+                                                 var="balance">
+                                        <p:column headerText="Số nhận" sortBy="">
+                                            <h:outputText value="#{balance.msisdn}" />
+                                        </p:column>
+                                        <p:column headerText="Số tiền" sortBy="">
+                                            <h:outputText value="#{balance.balanceNumber}"/>
+                                        </p:column>
+                                        <p:column headerText="Trạng thái" sortBy="">
+                                            <h:outputText value="#{balance.status}" />
+                                        </p:column>
+                                        <p:column headerText="Kết Quả" sortBy="">
+                                            <h:outputText value="#{balance.balanceResult}" />
+                                        </p:column>
+                                    </p:dataTable>
+                                </p:fieldset>
+                            </p:panel>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

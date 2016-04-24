@@ -1,0 +1,183 @@
+<ui:composition template="/include/etopup/layout-etopup-quanlySHT.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+
+    <ui:define name="lib-header">
+    </ui:define>
+    <ui:define name="content">
+        <h:form id="bonusDetailForm">
+            <p:growl id="growl" showDetail="true" autoUpdate="true" globalOnly="true"/>
+            <table style="width: 100%; height: 100%">
+                <tbody>
+                <tr>
+                    <td class="menu-left"><ui:insert>
+                        <ui:include src="/include/etopup/menu-top-left-etopup-quanlySHT.xhtml"/>
+                    </ui:insert></td>
+                    <td class="wr-main">
+                        <div class="main">
+                            <div class="top-bar-content">
+                                <div class="origin">
+                                    <a href="#{request.contextPath}/home/index.xhtml">Trang chủ</a>&#187;
+                                    <a class="here">Quản lý SHT</a>&#187;
+                                    <a class="here">Tra cứu trạng thái nhận hoa hồng</a>
+                                </div>
+                            </div>
+                        </div>
+                        <p:panel styleClass="main-panel-content">
+                            <p:fieldset id="searchDetails" legend="Điều kiện tra cứu" styleClass="searchFieldSet">
+                                <p:focus context="searchDetails"/>
+                                <p:panelGrid styleClass="searchCriteriaGrid">
+                                    <p:row>
+                                        <p:column styleClass="searchCriteriaGrid-label">
+                                            <p:outputLabel value="Số STK"/>
+                                        </p:column>
+                                        <p:column styleClass="searchCriteriaGrid-input">
+                                            <p:inputText id="agentAccount" styleClass="commonInputText"
+                                                         value="#{bonusStatusBrowserController.managementDTO.targetAccountId}">
+                                                <f:validator validatorId="numberValidator"/>
+                                            </p:inputText>
+                                        </p:column>
+                                        <p:column styleClass="searchCriteriaGrid-label">
+                                            <p:outputLabel value="Số thuê bao"/>
+                                        </p:column>
+                                        <p:column styleClass="searchCriteriaGrid-input">
+                                            <p:inputText id="agentMsisdn" styleClass="commonInputText"
+                                                         value="#{bonusStatusBrowserController.managementDTO.msisdnReceived}">
+                                                <f:validator validatorId="phoneValidator"/>
+                                            </p:inputText>
+                                        </p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column styleClass="searchCriteriaGrid-label">
+                                            <p:outputLabel value="Từ ngày" >
+                                                <p:outputLabel value="*" styleClass="red-star"/>
+                                            </p:outputLabel>
+                                        </p:column>
+                                        <p:column styleClass="searchCriteriaGrid-input">
+                                            <p:calendar id="startDate" label="Từ ngày"
+                                                        showButtonPanel="true"
+                                                        navigator="true"
+                                                        mode="popup"
+                                                        value="#{bonusStatusBrowserController.managementDTO.startDate}"
+                                                        pattern="dd/MM/yyyy"
+                                                        placeholder="Click để chọn ngày..."/>
+                                        </p:column>
+                                        <p:column styleClass="searchCriteriaGrid-label">
+                                            <p:outputLabel value="Đến ngày" >
+                                                <p:outputLabel value="*" styleClass="red-star"/>
+                                            </p:outputLabel>
+                                        </p:column>
+                                        <p:column styleClass="searchCriteriaGrid-input">
+                                            <p:calendar id="endDate" label="Đến ngày"
+                                                        showButtonPanel="true"
+                                                        navigator="true"
+                                                        mode="popup"
+                                                        value="#{bonusStatusBrowserController.managementDTO.endDate}"
+                                                        pattern="dd/MM/yyyy"
+                                                        placeholder="Click để chọn ngày..."/>
+                                        </p:column>
+                                    </p:row>
+                                </p:panelGrid>
+                                <p:panelGrid columns="1" styleClass="searchCriteriaGrid">
+                                    <p:commandButton id="searchBtn"
+                                                     value="Tìm"
+                                                     styleClass="commonButton"
+                                                     onclick="PF('blockEntirePage').show()"
+                                                     oncomplete="PF('blockEntirePage').hide()"
+                                                     actionListener="#{bonusStatusBrowserController.findBonusStatus}"
+                                                     update="transList bonusMessage"/>
+                                </p:panelGrid>
+                                <p:panelGrid columns="1" styleClass="searchCriteriaGrid">
+                                    <p:messages id="bonusMessage" autoUpdate="false" globalOnly="false"/>
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset id="transList" legend="Danh sách giao dịch" styleClass="resultFieldSet">
+                                <p:dataTable styleClass="table-list ft-left resultDataTable"
+                                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             paginator="true"
+                                             rows="15"
+                                             rowKey="#{bonus.transId}"
+                                             emptyMessage="Không có bản ghi nào."
+                                             paginatorPosition="bottom"
+                                             selectionMode="single"
+                                             lazy="true"
+                                             selection="#{bonusStatusBrowserController.transaction}"
+                                             resizableColumns="true"
+                                             value="#{bonusStatusBrowserController.model}"
+                                             var="bonus">
+                                    <p:ajax event="rowSelect"
+                                            listener="#{bonusStatusBrowserController.onSelectRowListener}"
+                                            update=":bonusDetailForm:transDetails "/>
+                                    <p:column headerText="Mã GD">
+                                        <h:outputText value="#{bonus.transId}"/>
+                                    </p:column>
+                                    <p:column headerText="Mã log">
+                                        <h:outputText
+                                                value="#{bonusStatusBrowserController.getTransLog(bonus.transId)}"/>
+                                    </p:column>
+                                    <p:column headerText="Số STK">
+                                        <h:outputText value="#{bonus.targetAccountId}"/>
+                                    </p:column>
+                                    <p:column headerText="Số ISDN">
+                                        <h:outputText value="#{bonus.targetMsisdn}"/>
+                                    </p:column>
+                                    <p:column headerText="Mã đại lý">
+                                        <h:outputText
+                                                value="#{bonusStatusBrowserController.getShtCode(bonus.targetMsisdn)}"/>
+                                    </p:column>
+                                    <p:column headerText="Loại GD">
+                                        <h:outputText value="#{bonus.transType}"/>
+                                    </p:column>
+                                    <p:column headerText="Gói cước">
+                                        <h:outputText
+                                                value="#{bonusStatusBrowserController.getCosCode(bonus.targetMsisdn)}"/>
+                                    </p:column>
+                                    <p:column headerText="Ngày tạo">
+                                        <h:outputText value="#{bonus.createDate}">
+                                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                        </h:outputText>
+                                    </p:column>
+                                </p:dataTable>
+                            </p:fieldset>
+                            <p:fieldset id="transDetails" legend="Chi tiết giao dịch" styleClass="resultFieldSet">
+                                <p:panelGrid columns="5" styleClass="searchCriteriaGrid">
+                                    <p:outputLabel value="Ngày kích hoạt"/>
+                                    <p:inputText id="activeDate" styleClass="commonInputText" readonly="true"
+                                                 value="#{bonusStatusBrowserController.activeDate}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                    </p:inputText>
+                                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                                    <p:outputLabel value="Kênh"/>
+                                    <p:inputText id="channel" styleClass="commonInputText" readonly="true"
+                                                 value="#{bonusStatusBrowserController.showTransChannel(bonusStatusBrowserController.transaction)}"/>
+
+                                    <p:outputLabel value="Mã Hoa hồng"/>
+                                    <p:inputText id="bonusCode" styleClass="commonInputText" readonly="true"
+                                                 value="#{bonusStatusBrowserController.transaction.proCode}"/>
+                                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                                    <p:outputLabel value="Hoa hồng"/>
+                                    <p:inputText id="bonus" styleClass="commonInputText" readonly="true"
+                                                 value="#{bonusStatusBrowserController.transaction.transAmount}"/>
+
+                                    <p:outputLabel value="Trạng thái"/>
+                                    <p:inputText id="status" styleClass="commonInputText" readonly="true"
+                                                 value="#{bonusStatusBrowserController.transaction.processStatusName}"/>
+                                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                                    <p:outputLabel value="Người thực hiện"/>
+                                    <p:inputText id="actioner" styleClass="commonInputText" readonly="true"
+                                                 value="#{bonusStatusBrowserController.actioner}"/>
+
+                                </p:panelGrid>
+                            </p:fieldset>
+                        </p:panel>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </h:form>
+    </ui:define>
+</ui:composition>

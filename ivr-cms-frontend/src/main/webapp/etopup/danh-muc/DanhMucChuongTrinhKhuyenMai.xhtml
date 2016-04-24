@@ -1,0 +1,291 @@
+<ui:composition template="/include/etopup/layout-etopup-danhmuc.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui">
+
+
+<ui:define name="lib-header">
+</ui:define>
+<ui:define name="content">
+<h:form id="promotionForm">
+  <p:hotkey bind="f9"/>
+  <p:growl id="growl" showDetail="true" autoUpdate="true" globalOnly="true"/>
+  <table style="width: 100%; height: 100%">
+    <tbody>
+    <tr>
+      <td class="menu-left"><ui:insert>
+        <ui:include src="/include/etopup/menu-top-left-etopup-danhmuc.xhtml"/>
+      </ui:insert></td>
+      <td class="wr-main">
+        <div class="main">
+          <div class="top-bar-content">
+            <div class="origin">
+              <a href="#{request.contextPath}/home/index.xhtml">Trang chủ</a>&#187;
+              <a class="here">Danh mục</a>&#187;
+              <a class="here">Danh mục chương trình khuyến mại</a>
+            </div>
+          </div>
+          <p:panel id="searchPromotionsPanel" styleClass="main-panel-content">
+            <p:focus context="searchPromotionsPanel"/>
+            <p:fieldset id="searchPromotionFieldSetId" legend="Tìm kiếm chương trình khuyến mại" styleClass="searchFieldSet">
+              <p:panelGrid columns="5" styleClass="searchCriteriaGrid">
+                <p:outputLabel value="Mã khuyến mãi"/>
+                <p:inputText id="code"
+                             value="#{promotionsEtopupController.promotionDTO.code}"/>
+                <p:outputLabel styleClass="emptySeperatorLabel"/>
+                <p:outputLabel value="Mô tả"/>
+                <p:inputText id="description"
+                             value="#{promotionsEtopupController.promotionDTO.description}"/>
+
+                <p:outputLabel value="Ngày bắt đầu"/>
+                <p:calendar id="staDate"
+                            showButtonPanel="true"
+                            navigator="true"
+                            value="#{promotionsEtopupController.promotionDTO.staDate}"
+                            mode="popup"
+                            pattern="dd/MM/yyyy"
+                            converter="customDateTimeConverter"
+                            placeholder="Click để chọn ngày..."/>
+                <p:outputLabel styleClass="emptySeperatorLabel"/>
+                <p:outputLabel value="Ngày kết thúc"/>
+                <p:calendar id="endDate"
+                            showButtonPanel="true"
+                            navigator="true"
+                            value="#{promotionsEtopupController.promotionDTO.endDate}"
+                            mode="popup"
+                            pattern="dd/MM/yyyy"
+                            converter="customDateTimeConverter"
+                            placeholder="Click để chọn ngày..."/>
+
+              </p:panelGrid>
+              <p:panelGrid columns="1" styleClass="searchCriteriaGrid" style="margin-top:20px">
+                <p:commandButton id="findPromotionsBtn"
+                                 value="Tìm kiếm"
+                                 styleClass="commonButton"
+                                 onclick="dataGridWidget.getPaginator().setPage(0);PF('blockEntirePage').show();"
+                                 oncomplete="PF('blockEntirePage').hide()"
+                                 update="promotionInfoFieldSet :promotionForm:growl"
+                                 actionListener="#{promotionsEtopupController.doFindPromotions}"/>
+              </p:panelGrid>
+            </p:fieldset>
+
+            <p:fieldset id="promotionInfoFieldSet" legend="Danh sách chương trình khuyến mại"
+                        styleClass="resultFieldSet">
+              <p:commandButton id="addPromotionBtn"
+                               value="Thêm"
+                               styleClass="commonButton"
+                               style="margin-bottom:15px;margin-left:15px"
+                               actionListener="#{promotionsEtopupController.onBeforeAddPromotion()}"
+                               update=":promotionAddUpdateForm:newPromotionDialogId"
+                               oncomplete="PF('newPromotionDialog').show()">
+                <p:resetInput target=":promotionAddUpdateForm:newPromotionFieldSet"/>
+              </p:commandButton>
+              <p:dataTable styleClass="table-list ft-left resultDataTable"
+                           id="promotionDataTableId"
+                           paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                           paginator="true"
+                           rows="15"
+                           emptyMessage="Không có bản ghi nào."
+                           rowKey="#{promotion}"
+                           lazy="true"
+                           paginatorPosition="bottom"
+                           resizableColumns="true"
+                           selectionMode="single"
+                           value="#{promotionsEtopupController.promotionsLazyDataModel}"
+                           var="promotion"
+                           widgetVar="dataGridWidget">
+                <p:column headerText="Mã khuyến mãi" sortBy="#{promotion.code}">
+                  <p:outputLabel value="#{promotion.code}"/>
+                </p:column>
+                <p:column headerText="Ngày bắt đầu" style="width:120px">
+                  <p:outputLabel value="#{promotion.staDate}">
+                    <f:convertDateTime pattern="dd/MM/yyyy" timeZone="#{promotionsEtopupController.currentTimeZone}"/>
+                  </p:outputLabel>
+                </p:column>
+                <p:column headerText="Ngày kết thúc" style="width:120px">
+                  <p:outputLabel value="#{promotion.endDate}">
+                    <f:convertDateTime pattern="dd/MM/yyyy" timeZone="#{promotionsEtopupController.currentTimeZone}"/>
+                  </p:outputLabel>
+                </p:column>
+                <p:column headerText="Mô tả">
+                  <p:outputLabel value="#{promotion.description}"/>
+                </p:column>
+                <p:column style="width:60px">
+                  <p:commandLink title="Chỉnh sửa" styleClass="bt-edit"
+                                 actionListener="#{promotionsEtopupController.onBeforeUpdatePromotion(promotion)}"
+                                 oncomplete="PF('newPromotionDialog').show()"
+                                 update=":promotionAddUpdateForm:newPromotionDialogId :promotionForm:growl">
+                    <p:resetInput target=":promotionAddUpdateForm:newPromotionFieldSet"/>
+                  </p:commandLink>
+                  <p:commandLink title="Xóa" styleClass="bt-delete-2"
+                                 actionListener="#{promotionsEtopupController.onBeforeDeletePromotion(promotion)}"
+                                 oncomplete="PF('confirmationDialog').show()"
+                                 update=":frm3:confirmationDialogId :promotionForm:growl"/>
+                </p:column>
+              </p:dataTable>
+            </p:fieldset>
+          </p:panel>
+        </div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</h:form>
+
+<h:form id="promotionAddUpdateForm">
+  <p:dialog
+    header="#{promotionsEtopupController.updatePromotion ? 'Sửa chương trình khuyến mại' : 'Thêm chương trình khuyến mại' }"
+    width="650px"
+    height="auto"
+    position="200,300"
+    widgetVar="newPromotionDialog"
+    resizable="false"
+    id="newPromotionDialogId"
+    showEffect="fade"
+    modal="true">
+
+    <!-- <p:messages id="newPromotionMessages" autoUpdate="true" globalOnly="true"/> -->
+
+    <p:fieldset id="newPromotionFieldSet" legend="Thông tin" styleClass="addFieldSet">
+      <p:panelGrid columns="2" style="border: none" styleClass="addPanelGrid"
+                   columnClasses="addPanelGrid-label, addPanelGrid-input">
+        <p:panel styleClass="groupPanel">
+          <p:outputLabel value="Mã khuyến mãi "/>
+          <p:outputLabel value="*" style="color:red"/>
+        </p:panel>
+        <p:inputText id="newPromotionCode"
+                     styleClass="commonInputText"
+                     required="true"
+                     label="Mã khuyến mãi"
+                     value="#{promotionsEtopupController.promotion.code}">
+          <o:validator validatorId="requiredContentValidator"/>
+          <f:validateLength maximum="50" minimum="1"/>
+          <o:validator validatorId="nameValidator"/>
+        </p:inputText>
+        <p:outputLabel styleClass="emptySeperatorLabel"/>
+        <p:message for="newPromotionCode"/>
+
+        <p:panel styleClass="groupPanel">
+          <p:outputLabel value="Mô tả "/>
+          <p:outputLabel value="*" style="color:red"/>
+        </p:panel>
+        <p:inputText id="newDescription"
+                         styleClass="commonInputText"
+                         required="true"
+                         label="Mô tả"
+                         autoResize="false"
+                         value="#{promotionsEtopupController.promotion.description}">
+          <o:validator validatorId="requiredContentValidator"/>
+          <f:validateLength maximum="500"/>
+        </p:inputText>
+        <p:outputLabel styleClass="emptySeperatorLabel"/>
+        <p:message for="newDescription"/>
+
+        <p:panel styleClass="groupPanel">
+          <p:outputLabel value="Ngày bắt đầu "/>
+          <p:outputLabel value="*" style="color:red"/>
+        </p:panel>
+        <p:calendar id="newStartDate"
+                    label="Ngày bắt đầu"
+                    showButtonPanel="true"
+                    navigator="true"
+                    required="true"
+                    value="#{promotionsEtopupController.promotion.staDate}"
+                    mode="popup"
+                    pattern="dd/MM/yyyy"
+                    converter="customDateTimeConverter"
+                    placeholder="Click để chọn ngày...">
+          <f:convertDateTime pattern="dd/MM/yyyy" timeZone="#{promotionsEtopupController.currentTimeZone}"/>
+        </p:calendar>
+        <p:outputLabel styleClass="emptySeperatorLabel"/>
+        <p:message for="newStartDate"/>
+
+        <p:panel styleClass="groupPanel">
+          <p:outputLabel value="Ngày kết thúc "/>
+          <p:outputLabel value="*" style="color:red"/>
+        </p:panel>
+        <p:calendar id="newEndDate"
+                    label="Ngày kết thúc"
+                    showButtonPanel="true"
+                    navigator="true"
+                    required="true"
+                    value="#{promotionsEtopupController.promotion.endDate}"
+                    mode="popup"
+                    pattern="dd/MM/yyyy"
+                    converter="customDateTimeConverter"
+                    placeholder="Click để chọn ngày...">
+          <f:convertDateTime pattern="dd/MM/yyyy" timeZone="#{promotionsEtopupController.currentTimeZone}"/>
+        </p:calendar>
+        <p:outputLabel styleClass="emptySeperatorLabel"/>
+        <p:message for="newEndDate"/>
+        <o:validateOrder id="dateOrder"
+                         type="lte"
+                         components="newStartDate newEndDate"
+                         message="Ngày bắt đầu phải trước ngày kết thúc"
+                         showMessageFor="newEndDate"/>
+      </p:panelGrid>
+
+      <p:panelGrid id="acceptBtnGrid" columns="3" style="margin-top:30px" styleClass="searchCriteriaGrid">
+        <p:commandButton id="acceptBtn"
+                         value="Chấp nhận"
+                         styleClass="commonButton"
+                         validateClient="true"
+                         onclick="PF('blockNewPromotion').show()"
+                         oncomplete="if(args.validationFailed || '#{promotionsEtopupController.stillShowAddPopup}' == 'true'){
+                           PF('blockNewPromotion').hide();
+                         }else{
+                           PF('blockNewPromotion').hide();
+                           PF('newPromotionDialog').hide();
+                         }"
+                         update="newPromotionFieldSet,:promotionForm:promotionDataTableId"
+                         actionListener="#{promotionsEtopupController.doAcceptPromotionChanging}"/>
+        <p:commandButton id="cancelBtn"
+                         value="Thoát"
+                         styleClass="commonButton"
+                         onclick="PF('newPromotionDialog').hide();"/>
+        <p:panel id="stillShowAddPopupPanel" styleClass="groupPanel"
+                 rendered="#{not promotionsEtopupController.updatePromotion}">
+          <p:selectBooleanCheckbox value="#{promotionsEtopupController.stillShowAddPopup}">
+            <p:ajax update="acceptBtnGrid"/>
+          </p:selectBooleanCheckbox>
+          <h:outputText value="Không ẩn popup" style="margin-left: 10px"/>
+        </p:panel>
+      </p:panelGrid>
+    </p:fieldset>
+
+  </p:dialog>
+
+  <p:blockUI block="newPromotionDialogId" widgetVar="blockNewPromotion">
+    <p:outputLabel value="Đang xử lý" style="margin-right:10px"/>
+    <p:graphicImage value="/content/images/ajax-loader.gif"/>
+  </p:blockUI>
+</h:form>
+
+<h:form id="frm3">
+  <p:dialog header="Xác nhận" widgetVar="confirmationDialog" id="confirmationDialogId" modal="true">
+    <p:panel styleClass="groupPanel" style="margin:10px;width:300px">
+      <p:outputLabel
+        value="Bạn có muốn xóa chương trình khuyến mại #{promotionsEtopupController.selectedPromotion.code}?"/>
+    </p:panel>
+    <p:panelGrid columns="2" styleClass="searchCriteriaGrid">
+      <p:commandButton id="yesBtn"
+                       value="Có"
+                       styleClass="commonButton"
+                       onclick="PF('confirmationDialog').hide();PF('blockEntirePage').show();"
+                       actionListener="#{promotionsEtopupController.doDeletePromotion()}"
+                       update=":promotionForm:promotionDataTableId"
+                       onsuccess="PF('blockEntirePage').hide();"/>
+      <p:commandButton id="noBtn" value="Không"
+                       styleClass="commonButton"
+                       onclick="PF('confirmationDialog').hide();"/>
+    </p:panelGrid>
+  </p:dialog>
+</h:form>
+
+</ui:define>
+
+</ui:composition>
+

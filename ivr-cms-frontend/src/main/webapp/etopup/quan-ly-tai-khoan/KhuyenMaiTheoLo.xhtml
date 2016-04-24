@@ -1,0 +1,91 @@
+<ui:composition template="/include/etopup/layout-etopup-quanlytaikhoan.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+  <f:metadata>
+    <f:event type="preRenderView" listener="#{promotionBatchEtopupController.onLoadPage}"/>
+  </f:metadata>
+
+  <ui:define name="lib-header">
+  </ui:define>
+  <ui:define name="content">
+    <h:form id="frm">
+      <p:hotkey bind="f9"/>
+      <p:growl id="growl" showDetail="true" autoUpdate="true" globalOnly="true"/>
+      <table style="width: 100%; height: 100%">
+        <tbody>
+        <tr>
+          <td class="menu-left"><ui:insert>
+            <ui:include src="/include/etopup/menu-top-left-etopup-quanlytaikhoan.xhtml"/>
+          </ui:insert></td>
+          <td class="wr-main">
+            <div class="main">
+              <div class="top-bar-content">
+                <div class="origin">
+                  <a href="#{request.contextPath}/home/index.xhtml">Trang chủ</a>
+                  <a class="here">Quản lý tài khoản</a>&#187;
+                  <a class="here">Khuyến mại theo lô</a>
+                </div>
+              </div>
+              <p:panel id="mainPanel" styleClass="main-panel-content">
+              	<p:focus context="mainPanel"/>
+              	<p:fieldset legend="Nhập từ file" styleClass="searchFieldSet">
+                  <p:panelGrid columns="3" styleClass="searchCriteriaGrid"
+                  columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label">
+                     <p:outputLabel value="Tên file">
+                         <span class="red-star"
+                               style="margin: 0">*</span>
+                     </p:outputLabel>
+                     <p:inputText readonly="true" styleClass="search-list-popup" style="width:300px" id="uploadedFileName"
+                                  value="#{promotionBatchEtopupController.uploadedFile.fileName}" />
+                          
+                     <p:fileUpload fileUploadListener="#{promotionBatchEtopupController.handleFileUpload}" id="selectFile"
+                                    value="#{promotionBatchEtopupController.uploadedFile}"
+                                    mode="advanced" dragDropSupport="false"
+                                    update="uploadedFileName fileContentError downloadErrorFileBtn"
+                                    sizeLimit="1000000" auto="true"
+                                    allowTypes="/(\.|\/)(txt)$/"
+                                    label="Chọn file"
+                                    styleClass="fileUpload-onebutton">
+                    </p:fileUpload>
+                    <p:outputLabel value="Khuyến mại">
+                         <span class="red-star"
+                               style="margin: 0">*</span>
+                    </p:outputLabel>
+                    <p:selectOneMenu styleClass="select-bill" value="#{promotionBatchEtopupController.promotionCode}">
+              			<f:selectItems value="#{promotionBatchEtopupController.promotionMap.entrySet()}"
+                             var="rs" itemValue="#{rs.key}" itemLabel="#{rs.value}"></f:selectItems>
+            		</p:selectOneMenu>
+            		<p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:messages id="fileContentError" autoUpdate="false"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                 </p:panelGrid>
+                 
+                 <p:panelGrid columns="2" styleClass="searchCriteriaGrid">
+                     <p:commandButton id="processFile" value="Gửi đi" styleClass="commonButton" style="margin-top:10px"
+                                      onclick="PF('blockEntirePage').show();"
+                                      oncomplete="PF('blockEntirePage').hide();"
+                                      actionListener="#{promotionBatchEtopupController.doUploadBatch}"
+                                      update="downloadErrorFileBtn fileContentError selectFile"/>
+                     <p:commandButton id="downloadErrorFileBtn" value="Download file lỗi" styleClass="commonButton" style="margin-top:10px"
+                                      disabled="#{!promotionBatchEtopupController.uploadedFileError}" ajax="false"
+                                      update="selectFile">
+                                      <p:fileDownload value="#{promotionBatchEtopupController.errorFile}" />
+                     </p:commandButton>
+                  </p:panelGrid>
+
+             	</p:fieldset>
+              </p:panel>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </h:form>
+  </ui:define>
+
+</ui:composition>
+

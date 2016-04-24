@@ -1,0 +1,161 @@
+<ui:composition template="/include/etopup/layout-etopup-quantridaily.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui">
+
+
+  <ui:define name="lib-header">
+  </ui:define>
+  <ui:define name="content">
+    <p:growl id="growl" showDetail="true" autoUpdate="true" globalOnly="true"/>
+    <table style="width: 100%; height: 100%">
+      <tbody>
+      <tr>
+        <td class="menu-left"><ui:insert>
+          <ui:include src="/include/etopup/menu-top-left-etopup-quantridaily.xhtml"/>
+        </ui:insert></td>
+        <td class="wr-main">
+          <div class="main">
+            <div class="top-bar-content">
+              <div class="origin">
+                <a href="#{request.contextPath}/home/index.xhtml">Trang chủ</a>&#187;
+                <a class="here">Quản trị đại lý</a>&#187;
+                <a class="here">Đổi thông thông tin cặp ICCID-MSISDN</a>
+              </div>
+            </div>
+            <p:panel styleClass="main-panel-content">
+              <h:form id="searchAgentManagementForm">
+
+                <p:fieldset id="searchAgentFieldSetId" legend="Tìm kiếm" styleClass="searchFieldSet">
+                  <p:focus context="searchAgentFieldSetId"/>
+                  <p:hotkey bind="f9"/>
+                  <p:panelGrid columns="3" style="margin-bottom:20px" styleClass="searchCriteriaGrid"
+                               columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label">
+                    <p:outputLabel value="Số thuê bao">
+                      <p:outputLabel value="*" styleClass="red-star"/>
+                    </p:outputLabel>
+                    <p:inputText id="msisdn" label="Số thuê bao"
+                                 value="#{iccidMsisdnChangeEtopupController.agentDTO.msisdn}"
+                                 style="width:300px" required="true">
+                      <o:validator validatorId="requiredContentValidator"/>
+                      <f:validator validatorId="phoneValidator"/>
+                    </p:inputText>
+                    <p:commandButton id="searchAgentBtn" value="Tìm kiếm" styleClass="commonButton"
+                                     onclick="PF('blockEntirePage').show()" oncomplete="PF('blockEntirePage').hide()"
+                                     validateClient="true"
+                                     update="searchAgentManagementForm, :changeIccidAndMsisdnInforForm:agentInfoFieldSet"
+                                     actionListener="#{iccidMsisdnChangeEtopupController.doFindAgentByMSISDN}">
+                      <p:resetInput target=":changeIccidAndMsisdnInforForm:agentInfoFieldSet"/>
+                    </p:commandButton>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message id="messageForMsisdn" for="msisdn"/>
+                  </p:panelGrid>
+                </p:fieldset>
+              </h:form>
+
+              <h:form id="changeIccidAndMsisdnInforForm">
+                <p:fieldset id="agentInfoFieldSet" legend="Chi tiết"
+                            styleClass="resultFieldSet">
+                  <p:panelGrid columns="1" styleClass="resultGrid" columnClasses="resultGrid-label">
+                    <p:panelGrid columns="5" styleClass="resultGrid"
+                                 columnClasses="resultGrid-label, resultGrid-input, resultGrid-label, resultGrid-label, resultGrid-input">
+                      <p:outputLabel value="Số thuê bao"></p:outputLabel>
+                      <p:inputText id="msisdnInfo" value="#{iccidMsisdnChangeEtopupController.agent.msisdn}"
+                                   styleClass="commonInputText"
+                                   label="Số thuê bao" required="true"
+                                   disabled="true">
+                      </p:inputText>
+                      <p:outputLabel styleClass="emptySeperatorLabel"/>
+                      <p:outputLabel value="Ngày Sinh"></p:outputLabel>
+                      <p:calendar id="bodInfo" label="Ngày Sinh"
+                                  showButtonPanel="true"
+                                  navigator="true"
+                                  required="true" mode="popup"
+                                  pattern="dd/MM/yyyy"
+                                  value="#{iccidMsisdnChangeEtopupController.agent.birthDate}"
+                                  disabled="true"/>
+                      <p:outputLabel value="Tên thương mại"></p:outputLabel>
+                      <p:inputText id="tradeNameInfo" value="#{iccidMsisdnChangeEtopupController.agent.tradeName}"
+                                   styleClass="commonInputText"
+                                   required="true" label="Tên thương mại"
+                                   disabled="true">
+                      </p:inputText>
+                      <p:outputLabel styleClass="emptySeperatorLabel"/>
+                      <p:outputLabel value="Chủ sở hữu">
+                      </p:outputLabel>
+                      <p:inputText id="ownerInfo" value="#{iccidMsisdnChangeEtopupController.agent.ownerName}"
+                                   styleClass="commonInputText"
+                                   disabled="true">
+                      </p:inputText>
+
+                      <p:outputLabel value="ICCID cũ">
+                      </p:outputLabel>
+                      <p:inputText id="oldIccidInfo" value="#{iccidMsisdnChangeEtopupController.agent.iccid}"
+                                   styleClass="commonInputText"
+                                   required="true" label="ICCID cũ"
+                                   disabled="true">
+                      </p:inputText>
+
+                      <p:outputLabel styleClass="emptySeperatorLabel"/>
+                      <p:outputLabel value="MSISDN cũ">
+                      </p:outputLabel>
+                      <p:inputText id="oldMSISDNInfo" value="#{iccidMsisdnChangeEtopupController.agent.msisdn}"
+                                   styleClass="commonInputText"
+                                   required="true" label="MSISDN cũ"
+                                   disabled="true">
+                      </p:inputText>
+
+                      <p:outputLabel value="Nhập ICCID mới "><p:outputLabel value="*"
+                                                                            styleClass="red-star"/></p:outputLabel>
+                      <p:inputText id="newICCID" value="#{iccidMsisdnChangeEtopupController.newICCID}"
+                                   styleClass="commonInputText"
+                                   required="true" label="ICCID mới"
+                                   disabled="#{!iccidMsisdnChangeEtopupController.enableEditing}">
+                        <o:validator validatorId="requiredContentValidator"/>
+                        <o:validator validatorId="numberValidator"/>
+                        <f:validateLength minimum="19" maximum="20"/>
+                      </p:inputText>
+                      <p:outputLabel styleClass="emptySeperatorLabel"/>
+
+                      <p:outputLabel value="Nhập MSISDN mới "><p:outputLabel value="*"
+                                                                             styleClass="red-star"/></p:outputLabel>
+                      <p:inputText id="newMSISDN" value="#{iccidMsisdnChangeEtopupController.newMSISDN}"
+                                   styleClass="commonInputText"
+                                   required="true" label="MSISDN mới"
+                                   disabled="#{!iccidMsisdnChangeEtopupController.enableEditing}">
+                        <o:validator validatorId="requiredContentValidator"/>
+                        <f:validator validatorId="phoneValidator"/>
+                      </p:inputText>
+
+                      <p:outputLabel styleClass="emptySeperatorLabel"/>
+                      <p:message id="messageFornewICCID" for="newICCID"/>
+
+                      <p:outputLabel styleClass="emptySeperatorLabel"/>
+                      <p:outputLabel styleClass="emptySeperatorLabel"/>
+                      <p:message id="messageFornewMSISDN" for="newMSISDN"/>
+
+                    </p:panelGrid>
+                    <p:panelGrid columns="3" styleClass="resultGrid" style="margin-bottom: 10px">
+                      <p:commandButton id="updateBtn" value="Thực hiện" styleClass="commonButton" validateClient="true"
+                                       onclick="PF('blockEntirePage').show()" oncomplete="PF('blockEntirePage').hide()"
+                                       actionListener="#{iccidMsisdnChangeEtopupController.doChangeICCIDAndMSISDN}"
+                                       disabled="#{!iccidMsisdnChangeEtopupController.enableEditing}"
+                                       update=":changeIccidAndMsisdnInforForm:messageFornewICCID, :changeIccidAndMsisdnInforForm:messageFornewMSISDN, :changeIccidAndMsisdnInforForm:updateBtn">
+                      </p:commandButton>
+                    </p:panelGrid>
+                  </p:panelGrid>
+                </p:fieldset>
+              </h:form>
+
+
+            </p:panel>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+  </ui:define>
+</ui:composition>
+

@@ -1,0 +1,34 @@
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:h="http://java.sun.com/jsf/html" 
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:p="http://primefaces.org/ui">
+
+  <a href="#{request.contextPath}"><img src="#{request.contextPath}/content/images/logo-epos.png" alt="CMS" title="CMS"
+    class="logo2" /></a>
+ 
+  <div class="block-top-right">
+    <h:form>
+    <a href="#" class="question"><img src="#{request.contextPath}/content/images/question.png" width="25"
+      height="25" alt="CMS" /></a>
+      
+        <h:commandLink styleClass="log-out" value="Đăng xuất" action="#{auth.logout}"></h:commandLink> 
+        <a href="#" class="user-name-header"><h:outputText value="#{auth.member.fullName}"/></a>
+        Role: <h:outputText value="#{auth.member.role}"></h:outputText>
+        Company: <h:outputText value="#{auth.member.companyId}"></h:outputText>
+    </h:form>  
+    <p:ajaxStatus style="" id="ajaxStatusPanel">
+      <f:facet name="start">
+        <div class="ajax-status">
+          <h2>#{t['ajax.status.title']}</h2>
+        </div>
+      </f:facet>
+      
+      <f:facet name="complete">
+        <h:outputText value="" />
+      </f:facet>
+    </p:ajaxStatus>
+  </div>
+
+</ui:composition>

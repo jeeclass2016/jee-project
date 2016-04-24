@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faces-config xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_2.xsd"
+	version="2.2">
+
+	<application>
+    <el-resolver>
+        org.springframework.web.jsf.el.SpringBeanFacesELResolver
+    </el-resolver>
+    <action-listener>org.primefaces.application.DialogActionListener</action-listener>
+    <navigation-handler>org.primefaces.application.DialogNavigationHandler</navigation-handler>
+    <view-handler>org.primefaces.application.DialogViewHandler</view-handler>
+        
+    <message-bundle>Messages</message-bundle>
+    <resource-bundle>
+      <base-name>Text</base-name>
+      <var>t</var>      
+    </resource-bundle>
+    <resource-bundle>
+      <base-name>Error</base-name>
+      <var>e</var>
+    </resource-bundle>
+    <resource-bundle>
+      <base-name>Msg</base-name>
+      <var>m</var>
+    </resource-bundle>
+    <locale-config>
+      <default-locale>vi</default-locale>
+      <supported-locale>en</supported-locale>
+      <supported-locale>vi</supported-locale>
+    </locale-config>
+  </application>
+  
+  <factory>
+    <exception-handler-factory>org.omnifaces.exceptionhandler.FullAjaxExceptionHandlerFactory</exception-handler-factory>
+  </factory>
+  <factory>
+    <render-kit-factory>org.omnifaces.renderkit.Html5RenderKitFactory</render-kit-factory>
+  </factory>
+  <lifecycle>
+    <phase-listener>com.vietsci.cms.frontend.jsf.JsfLifeCycleListener</phase-listener>
+  </lifecycle>
+</faces-config>

@@ -1,0 +1,214 @@
+<ui:composition template="/include/etopup/layout-etopup-quanlySHT.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+  <f:metadata>
+    <f:event type="preRenderView" listener="#{etopupTransLookupEtopupController.initBeforeLoadingPage}"/>
+  </f:metadata>
+
+  <ui:define name="lib-header">
+  </ui:define>
+  <ui:define name="content">
+    <p:growl id="growl" showDetail="true" autoUpdate="true" globalOnly="true"/>
+    <table style="width: 100%; height: 100%">
+      <tbody>
+      <tr>
+        <td class="menu-left"><ui:insert>
+          <ui:include src="/include/etopup/menu-top-left-etopup-quanlySHT.xhtml"/>
+        </ui:insert></td>
+        <td class="wr-main">
+          <div class="main">
+            <div class="top-bar-content">
+              <div class="origin">
+                <a href="#{request.contextPath}/home/index.xhtml">Trang chủ</a>&#187;
+                <a class="here">Quản lý SHT</a>&#187;
+                <a class="here">Tra cứu giao dịch ETOPUP</a>
+              </div>
+            </div>
+
+            <p:panel styleClass="main-panel-content">
+              <h:form id="transLookupForm">
+                <p:fieldset id="searchFieldSetId" legend="Điều kiện tra cứu" styleClass="searchFieldSet">
+                  <p:focus context="searchFieldSetId"/>
+                  <p:panelGrid columns="5" styleClass="searchCriteriaGrid"
+                               columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label, searchCriteriaGrid-label, searchCriteriaGrid-input">
+
+                    <p:outputLabel value="Số TB chuyển"/>
+                    <p:inputText id="msisdnSource" label="Số TB chuyển"
+                                 value="#{etopupTransLookupEtopupController.etopupTransLookupDTO.msisdnSource}">
+                      <f:validator validatorId="phoneValidator"/>
+                    </p:inputText>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+
+                    <p:outputLabel value="Số TB nhận"/>
+                    <p:inputText id="msisdnTarget" label="Số TB nhận"
+                                 value="#{etopupTransLookupEtopupController.etopupTransLookupDTO.msisdnTarget}">
+                      <f:validator validatorId="phoneValidator"/>
+                    </p:inputText>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="msisdnSource"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="msisdnTarget"/>
+
+                    <p:outputLabel value="Từ ngày">
+                      <p:outputLabel value="*" styleClass="red-star"/>
+                    </p:outputLabel>
+                    <p:calendar id="startDate" required="true"
+                                showButtonPanel="true"
+                                value="#{etopupTransLookupEtopupController.etopupTransLookupDTO.startDate}"
+                                label="Từ ngày"
+                                navigator="true"
+                                mode="popup"
+                                pattern="dd/MM/yyyy"
+                                placeholder="Click để chọn ngày..."
+                                converter="customDateTimeConverter"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+
+                    <p:outputLabel value="Đến ngày">
+                      <p:outputLabel value="*" styleClass="red-star"/>
+                    </p:outputLabel>
+                    <p:calendar id="endDate" required="true"
+                                showButtonPanel="true"
+                                value="#{etopupTransLookupEtopupController.etopupTransLookupDTO.endDate}"
+                                label="Đến ngày"
+                                navigator="true"
+                                mode="popup"
+                                pattern="dd/MM/yyyy"
+                                placeholder="Click để chọn ngày..."
+                                converter="customDateTimeConverter"/>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="startDate"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message for="endDate"/>
+
+                    <p:outputLabel value="Loại giao dịch"/>
+                    <p:selectOneMenu id="transType" label="Loại giao dịch" style="width: 157px;"
+                                     value="#{etopupTransLookupEtopupController.etopupTransLookupDTO.transType}">
+                      <f:selectItem itemLabel="Tất cả" itemValue=""/>
+                      <f:selectItems value="#{etopupTransLookupEtopupController.transTypeSelectItems}"/>
+                    </p:selectOneMenu>
+                  </p:panelGrid>
+
+                  <p:panelGrid columns="1" styleClass="searchCriteriaGrid" style="margin-top:10px; margin-bottom:10px">
+                    <p:commandButton id="searchBtn"
+                                     value="Tìm kiếm"
+                                     styleClass="commonButton"
+                                     onclick="PF('blockEntirePage').show();"
+                                     oncomplete="PF('blockEntirePage').hide()"
+                                     validateClient="true"
+                                     actionListener="#{etopupTransLookupEtopupController.findTrans}"
+                                     update=":transLookupForm:searchFieldSetId :transListForm:transactionListFieldSet"/>
+                  </p:panelGrid>
+
+                </p:fieldset>
+              </h:form>
+
+              <h:form id="transListForm">
+                <p:fieldset id="transactionListFieldSet" legend="Thông tin giao dịch" styleClass="resultFieldSet">
+                  <p:dataTable styleClass="table-list ft-left resultDataTable"
+                               paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                               paginator="true"
+                               rows="15"
+                               rowKey="#{trans.transId}"
+                               paginatorPosition="bottom"
+                               resizableColumns="true"
+                               emptyMessage="Không có thông tin nào"
+                               lazy="true"
+                               selectionMode="single"
+                               selection="#{etopupTransLookupEtopupController.selectedTrans}"
+                               value="#{etopupTransLookupEtopupController.transLazyDataModel}"
+                               var="trans">
+
+                    <p:ajax event="rowSelect" listener="#{etopupTransLookupEtopupController.findTransDetail}"
+                            update=":transDetailsForm:transactionDetailFieldSet"/>
+
+                    <p:column headerText="Mã GD">
+                      <h:outputText value="#{trans.transId}"/>
+                    </p:column>
+                    <p:column headerText="Loại GD">
+                      <h:outputText value="#{trans.transType}"/>
+                    </p:column>
+                    <p:column headerText="Trạng thái">
+                      <h:outputText rendered="#{trans.processStatus==1}" value="Chưa duyệt"/>
+                      <h:outputText rendered="#{trans.processStatus==2}" value="Đang xử lý"/>
+                      <h:outputText rendered="#{trans.processStatus==3}" value="Hoàn thành"/>
+                      <h:outputText rendered="#{trans.processStatus==9}" value="Hủy bỏ"/>
+                    </p:column>
+                    <p:column headerText="Kênh">
+                      <h:outputText value="#{etopupTransLookupEtopupController.showTransChannel(trans)}"/>
+                    </p:column>
+                    <p:column headerText="Ngày tạo" style="width:80px">
+                      <h:outputText value="#{trans.createDate}">
+                        <f:convertDateTime pattern="dd/MM/yyyy"
+                                           timeZone="#{etopupTransLookupEtopupController.currentTimeZone}"/>
+                      </h:outputText>
+                    </p:column>
+                    <p:column headerText="TB chuyển">
+                      <h:outputText value="#{trans.sourceMsisdn}"/>
+                    </p:column>
+                    <p:column headerText="TB nhận">
+                      <h:outputText value="#{trans.targetMsisdn}"/>
+                    </p:column>
+                    <p:column headerText="Số tiền GD">
+                      <h:outputText value="#{trans.transAmount}"/>
+                    </p:column>
+                  </p:dataTable>
+                </p:fieldset>
+              </h:form>
+
+              <h:form id="transDetailsForm">
+                <p:fieldset id="transactionDetailFieldSet" legend="Chi tiết giao dịch" styleClass="resultFieldSet">
+                  <p:panelGrid columns="5" styleClass="resultGrid" style="margin-top:10px; margin-bottom:30px"
+                               columnClasses="resultGrid-label, resultGrid-input, resultGrid-label, resultGrid-label, resultGrid-input">
+                    <p:outputLabel value="Mã GD"/>
+                    <p:inputText value="#{etopupTransLookupEtopupController.selectedTrans.transId}"
+                                 styleClass="commonInputText"
+                                 disabled="true"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+
+                    <p:outputLabel value="Loại giao dịch"/>
+                    <p:inputText value="#{etopupTransLookupEtopupController.selectedTrans.transType}"
+                                 styleClass="commonInputText"
+                                 disabled="true"/>
+
+                    <p:outputLabel value="Số dư TB chuyển"/>
+                    <p:inputText value="#{etopupTransLookupEtopupController.sourceAccount.availBalance}"
+                                 styleClass="commonInputText"
+                                 disabled="true"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+
+                    <p:outputLabel value="Số dư TB nhận"/>
+                    <p:inputText value="#{etopupTransLookupEtopupController.targetAccount.availBalance}"
+                                 styleClass="commonInputText"
+                                 disabled="true"/>
+
+                    <p:outputLabel value="Ngày thay đổi"/>
+                    <p:calendar pattern="dd/MM/yyyy" converter="customDateTimeConverter"
+                                value="#{etopupTransLookupEtopupController.selectedTrans.lastModified}"
+                                disabled="true"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+
+                    <p:outputLabel value="Mã lỗi"/>
+                    <p:inputText value="#{etopupTransLookupEtopupController.selectedTrans.errCode}"
+                                 styleClass="commonInputText"
+                                 disabled="true"/>
+                  </p:panelGrid>
+                </p:fieldset>
+              </h:form>
+            </p:panel>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </ui:define>
+</ui:composition>

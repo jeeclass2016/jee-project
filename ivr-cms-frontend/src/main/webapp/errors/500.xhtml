@@ -1,0 +1,18 @@
+<ui:composition template="/include/error_layout.html" xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:ui="http://java.sun.com/jsf/facelets">
+  <ui:define name="contentTitle">
+    <h1>
+      <b>whoops !!!</b>
+    </h1>
+    <h2>
+      <b>We're sorry, but something went wrong. Please contact your support team for assistance.</b>
+    </h2>
+    <div class="error_button">
+      <a href="#{request.contextPath}" class="btn" style="margin-right: 10px">Back to home page</a>
+    </div>
+    <img width="382" height="264" src="#{request.contextPath}/content/images/error_500.png" />
+     111 #{facesContext.application.projectStage}
+    
+
+  </ui:define>
+</ui:composition>

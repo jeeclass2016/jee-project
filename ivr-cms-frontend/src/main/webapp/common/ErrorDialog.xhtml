@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:p="http://primefaces.org/ui">
+
+<f:view locale="#{languageController.currentLocale}">
+  <h:head>
+    <title>Lỗi</title>
+    <link rel="stylesheet" type="text/css"
+      href="#{request.contextPath}/content/css/reset.css" />
+    <link rel="stylesheet" type="text/css"
+      href="#{request.contextPath}/content/css/style.css" />
+    <link rel="stylesheet" type="text/css"
+      href="#{request.contextPath}/content/css/dialog_style.css" />
+    <link rel="stylesheet" type="text/css"
+      href="#{request.contextPath}/content/css/epoch_styles.css" />
+    <link rel="stylesheet" type="text/css"
+      href="#{request.contextPath}/content/css/customized-primefaces.css" />
+  </h:head>
+
+  <h:body>
+    <h:form id="form">
+        <h:outputText value="Có lỗi xảy ra trong quá trình xử lý. Vui lòng liên hệ với Administrator!" />
+    </h:form>
+  </h:body>
+</f:view>
+</html>

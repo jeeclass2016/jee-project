@@ -1,0 +1,222 @@
+<ui:composition template="/include/etopup/layout-etopup-quanlytaikhoan.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+
+    <ui:define name="lib-header">
+    </ui:define>
+    <ui:define name="content">
+        <h:form id="transferFromOmForm">
+            <table style="width: 100%; height: 100%">
+                <tbody>
+                <tr>
+                    <td class="menu-left"><ui:insert>
+                        <ui:include src="/include/etopup/menu-top-left-etopup-quanlytaikhoan.xhtml"/>
+                    </ui:insert></td>
+                    <td class="wr-main">
+                        <div class="main">
+                            <div class="top-bar-content">
+                                <div class="origin">
+                                    <a href="#{request.contextPath}/home/index.xhtml">Trang chủ</a>&#187;
+                                    <a class="here">Quản lý tài khoản</a>&#187;
+                                    <a class="here">Chuyển tiền từ OM</a>
+                                </div>
+                            </div>
+                        </div>
+                        <p:panel styleClass="main-panel-content">
+                            <p:fieldset id="searchDetails" legend="Tìm kiếm thông tin" styleClass="searchFieldSet">
+                                <p:focus context="searchDetails"/>
+                                <p:panelGrid styleClass="searchCriteriaGrid">
+                                    <p:row>
+                                        <p:column styleClass="searchCriteriaGrid-label">
+                                            <p:outputLabel value="Mã đơn hàng"/>
+                                        </p:column>
+                                        <p:column styleClass="searchCriteriaGrid-input">
+                                            <p:inputText id="orderSearchCode" styleClass="commonInputText"
+                                                         value="#{tranferMoneyFromOMController.erpPosSaleOrdersDTO.orderId}"/>
+                                        </p:column>
+                                        <p:column styleClass="searchCriteriaGrid-label">
+                                            <p:outputLabel value="Mã cửa hàng"/>
+                                        </p:column>
+                                        <p:column styleClass="searchCriteriaGrid-input">
+                                            <p:inputText id="shtSearchCode" styleClass="commonInputText" value="#{tranferMoneyFromOMController.erpPosSaleOrdersDTO.shtId}"/>
+                                        </p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column styleClass="searchCriteriaGrid-label">
+                                            <p:outputLabel value="Trạng thái"/>
+                                        </p:column>
+                                        <p:column colspan="4" styleClass="searchCriteriaGrid-input">
+                                            <p:selectOneMenu id="status" required="true" value="#{tranferMoneyFromOMController.erpPosSaleOrdersDTO.status}">
+                                                <f:selectItems value="#{tranferMoneyFromOMController.statusList}" />
+                                            </p:selectOneMenu>
+                                        </p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column styleClass="searchCriteriaGrid-label">
+                                            <p:outputLabel value="Từ ngày"/>
+                                        </p:column>
+                                        <p:column styleClass="searchCriteriaGrid-input">
+                                            <p:calendar id="startDate" label="Đến ngày"
+                                                        showButtonPanel="true"
+                                                        navigator="true"
+                                                        mode="popup"
+                                                        pattern="dd/MM/yyyy"
+                                                        value="#{tranferMoneyFromOMController.erpPosSaleOrdersDTO.startDate}"
+                                                        placeholder="Click để chọn ngày..."/>
+                                        </p:column>
+                                        <p:column styleClass="searchCriteriaGrid-label">
+                                            <p:outputLabel value="Đến ngày"/>
+                                        </p:column>
+                                        <p:column styleClass="searchCriteriaGrid-input">
+                                            <p:calendar id="endDate" label="Đến ngày"
+                                                        showButtonPanel="true"
+                                                        navigator="true"
+                                                        mode="popup"
+                                                        pattern="dd/MM/yyyy"
+                                                        value="#{tranferMoneyFromOMController.erpPosSaleOrdersDTO.endDate}"
+                                                        placeholder="Click để chọn ngày..."/>
+                                        </p:column>
+                                    </p:row>
+                                </p:panelGrid>
+                                <p:panelGrid columns="2" styleClass="searchCriteriaGrid">
+                                    <p:commandButton id="searchBtn"
+                                                     value="Tìm"
+                                                     styleClass="commonButton"
+                                                     onclick="PF('blockEntirePage').show()"
+                                                     oncomplete="PF('blockEntirePage').hide()"
+                                                     update="transList sthInformation generateFileBtn"
+                                                     actionListener="#{tranferMoneyFromOMController.findOrder}"/>
+                                    <p:commandButton id="generateFileBtn"
+                                                     value="Xuất file"
+                                                     styleClass="commonButton"
+                                                     ajax="false"
+                                                     disabled="#{tranferMoneyFromOMController.disableExportingData}">
+                                        <p:fileDownload value="#{tranferMoneyFromOMController.exportExcel()}" />
+                                    </p:commandButton>
+                                </p:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset id="transList" legend="Danh sách giao dịch" styleClass="resultFieldSet">
+                                <p:dataTable styleClass="table-list ft-left resultDataTable"
+                                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             paginator="true"
+                                             rows="15"
+                                             rowKey="#{order.orderNumber}"
+                                             emptyMessage="Không có bản ghi nào."
+                                             paginatorPosition="bottom"
+                                             selectionMode="single" selection="#{tranferMoneyFromOMController.selectedItem}"
+                                             resizableColumns="true"
+                                             value="#{tranferMoneyFromOMController.dataModel}"
+                                             var="order">
+                                    <p:ajax event="rowSelect" listener="#{tranferMoneyFromOMController.onSelectRowListener}"
+                                            update=":transferFromOmForm:sthInformation"/>
+                                    <p:column headerText="Mã đơn hàng">
+                                        <h:outputText value="#{order.orderNumber}"/>
+                                    </p:column>
+                                    <p:column headerText="Mã cửa hàng" >
+                                        <h:outputText value="#{order.dealerCode}"/>
+                                    </p:column>
+                                    <p:column headerText="Tên cửa hàng" style="width: 200px">
+                                        <h:outputText value="#{order.partyName}"/>
+                                    </p:column>
+                                    <p:column headerText="Ngày lập đơn hàng" >
+                                        <h:outputText value="#{order.orderDate}">
+                                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="Ngày xuất hàng" >
+                                        <h:outputText value="#{order.lastModified}">
+                                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="Ngày giao hàng" >
+                                        <h:outputText value="#{order.issueDateTime}">
+                                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                        </h:outputText>
+                                    </p:column>
+                                    <p:column headerText="Loại giao dịch">
+                                        <h:outputText value="#{tranferMoneyFromOMController.getTransType(order.transId)}"/>
+                                    </p:column>
+                                    <p:column headerText="Số tiền" >
+                                        <h:outputText value="#{order.amount}"/>
+                                    </p:column>
+                                    <p:column headerText="Thuế" >
+                                        <h:outputText value="#{order.taxValue}" />
+                                    </p:column>
+                                    <p:column headerText="Số lượng đặt" >
+                                        <h:outputText value="#{order.orderQuantityUom}"/>
+                                    </p:column>
+                                    <p:column headerText="Đơn vị giá" >
+                                        <h:outputText value="#{order.unitListPrice}"/>
+                                    </p:column>
+                                    <p:column headerText="Trạng thái" >
+                                        <h:outputText value="#{order.status}"/>
+                                    </p:column>
+                                </p:dataTable>
+                            </p:fieldset>
+                            <p:fieldset id="sthInformation" legend="Thông tin đại lý"
+                                        styleClass="resultFieldSet">
+                                <p:panelGrid columns="5" styleClass="searchCriteriaGrid">
+                                    <p:outputLabel value="Số thuê bao"/>
+                                    <p:inputText id="shtMsisdn" styleClass="commonInputText" readonly="true"
+                                                 value="#{tranferMoneyFromOMController.selectedAgent.msisdn}"/>
+                                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                                    <p:outputLabel value="Số ICCID"/>
+                                    <p:inputText id="shtIccid" styleClass="commonInputText" readonly="true"
+                                                 value="#{tranferMoneyFromOMController.selectedAgent.iccid}"/>
+
+                                    <p:outputLabel value="Mã đại lý"/>
+                                    <p:inputText id="shtCode" styleClass="commonInputText" readonly="true"
+                                                 value="#{tranferMoneyFromOMController.selectedAgent.agentId}"/>
+                                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                                    <p:outputLabel value="Tên đại lý"/>
+                                    <p:inputText id="shtName" styleClass="commonInputText" readonly="true"
+                                                 value="#{tranferMoneyFromOMController.selectedAgent.tradeName}"/>
+
+                                    <p:outputLabel value="Chủ sở hữu"/>
+                                    <p:inputText id="shtOwner" styleClass="commonInputText" readonly="true"
+                                                 value="#{tranferMoneyFromOMController.selectedAgent.ownerName}"/>
+                                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                                    <p:outputLabel value="Địa chỉ"/>
+                                    <p:inputText id="shtAddress" styleClass="commonInputText" readonly="true"
+                                                 value="#{tranferMoneyFromOMController.selectedAgent.outletAddress}"/>
+
+                                </p:panelGrid>
+                                <p:panelGrid columns="3" styleClass="searchCriteriaGrid">
+                                    <p:commandButton id="acceptBtn"
+                                                     value="Duyệt"
+                                                     styleClass="commonButton"
+                                                     onclick="PF('blockEntirePage').show()"
+                                                     oncomplete="PF('blockEntirePage').hide()"
+                                                     update="tranferMoneyMessage transList"
+                                                     actionListener="#{tranferMoneyFromOMController.transferMoney}"/>
+                                    <p:commandButton id="declineBth"
+                                                     value="Từ chối"
+                                                     styleClass="commonButton"
+                                                     onclick="PF('blockEntirePage').show()"
+                                                     oncomplete="PF('blockEntirePage').hide()"
+                                                     update="searchDetails sthInformation transList"
+                                                     actionListener="#{tranferMoneyFromOMController.reject}"/>
+
+                                    <p:commandButton id="printBtn"
+                                                     value="In"
+                                                     styleClass="commonButton"
+                                                     onclick="PF('blockEntirePage').show()"
+                                                     oncomplete="PF('blockEntirePage').hide()"
+                                                     update=""/>
+                                </p:panelGrid>
+                                <p:panelGrid columns="1" styleClass="searchCriteriaGrid">
+                                    <p:messages id="tranferMoneyMessage" globalOnly="false" autoUpdate="false" />
+                                </p:panelGrid>
+                            </p:fieldset>
+                        </p:panel>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </h:form>
+    </ui:define>
+</ui:composition>

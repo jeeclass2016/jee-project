@@ -1,0 +1,284 @@
+<ui:composition template="/include/etopup/layout-etopup-quantridaily.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+
+  <ui:define name="lib-header">
+  </ui:define>
+  <ui:define name="content">
+    <h:form id="frm">
+      <p:hotkey bind="f9"/>
+      <p:growl id="growl" showDetail="true" autoUpdate="true" globalOnly="true"/>
+      <table style="width: 100%; height: 100%">
+        <tbody>
+        <tr>
+          <td class="menu-left"><ui:insert>
+            <ui:include src="/include/etopup/menu-top-left-etopup-quantridaily.xhtml"/>
+          </ui:insert></td>
+          <td class="wr-main">
+            <div class="main">
+              <div class="top-bar-content">
+                <div class="origin">
+                  <a href="#{request.contextPath}/home/index.xhtml">Trang chủ</a>&#187;
+                  <a class="here">Quản trị đại lý</a>&#187;
+                  <a class="here">Quản trị địa bàn hoạt động của đại lý</a>
+                </div>
+              </div>
+	    <!-- Adhere -->
+            <p:panel styleClass="main-panel-content">
+              <p:fieldset id="searchFieldSetId" legend="Thông tin tìm kiếm" styleClass="searchFieldSet">
+              	<p:focus context="searchFieldSetId"/>
+              	<p:panelGrid columns="3" style="margin-bottom:20px" styleClass="searchCriteriaGrid"
+                               columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label">
+              	   <p:outputLabel value="Số thuê bao">
+                      <p:outputLabel value="*" styleClass="red-star"/>
+                    </p:outputLabel>
+                  <p:inputText id="msdnTxt" style="width:300px"
+                               value="#{agentAddressManagementController.agentAddressMgmtDTO.msisdn}" >
+                  </p:inputText>             
+                  <p:commandButton value="Tìm kiếm"
+                                 actionListener="#{agentAddressManagementController.findAgentAddressList}"
+                                 update="growl messageForMsisdn resultList addButton"
+                                 onclick="PF('blockEntirePage').show();"
+                                 oncomplete="PF('blockEntirePage').hide()"    
+                                 styleClass="commonButton" >
+                  </p:commandButton>               
+                  <p:outputLabel styleClass="emptySeperatorLabel"/>
+                  <p:message id="messageForMsisdn" for="msdnTxt"/>               
+              	</p:panelGrid>
+              </p:fieldset>
+              <p:fieldset legend="Thông tin đại lý" styleClass="resultFieldSet">
+            	<p:commandButton value="Thêm" id="addButton"
+            					 oncomplete="PF('addNewDlg').show()"
+            					 actionListener="#{agentAddressManagementController.onCreateNewAgentAddress()}"
+            					 update=":frm1:addNewDlgId"
+                                 styleClass="commonButton"
+                                 disabled="#{!agentAddressManagementController.enableAddNewAgentAddressButton}"
+                                 style="margin-bottom:15px; margin-left:15px;" >
+                  <p:resetInput target=":frm1:addNewDlgId"/>               
+                </p:commandButton>
+                <p:dataTable id="resultList" styleClass="table-list ft-left resultDataTable"
+                             columnClasses="col-15,col-20,col-10,col-10,col-10,col-10,col-15,col-10"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                             paginator="true"
+                             rows="15"
+                             rowKey="#{r.agentAddressId}"
+                             paginatorPosition="bottom"
+                             resizableColumns="true"
+                             selectionMode="single"
+                             value="#{agentAddressManagementController.agentAddressDataModel}"
+                             var="r"
+                             emptyMessage="Không có bản ghi nào"
+                             >
+                  <p:column headerText="Số thuê bao" width="120"><p:outputLabel value="#{r.msisdn}"/></p:column>
+                  <p:column headerText="Tên đại lý" ><p:outputLabel value="#{r.agent.tradeName}"/></p:column>
+                  <p:column headerText="Miền" >
+                  	<p:outputLabel value="#{agentAddressManagementController.showRegionInfo(r.region)}"/>
+                  </p:column>
+                  <p:column headerText="Tỉnh" ><p:outputLabel value="#{r.province}"/></p:column>
+                  <p:column headerText="Quận/Huyện"><p:outputLabel value="#{r.district}"/></p:column>
+                  <p:column headerText="Trạng thái" width="120">
+                  	<p:outputLabel value="#{agentAddressManagementController.showStatusInfo(r.status)}"/>
+                  </p:column>
+                  <p:column width="30">
+                    <p:commandLink title="Chỉnh sửa" styleClass="bt-edit"
+                    				actionListener="#{agentAddressManagementController.onEditCurrentAgentAddress(r)}" 
+                                     update=":frm2:addNewDlgId"
+                                     oncomplete="PF('editCurDlg').show()">
+                    </p:commandLink>
+                  </p:column>
+                </p:dataTable>
+            </p:fieldset>
+            </p:panel>
+            </div>
+
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </h:form>
+    
+    
+    <h:form id="frm1">
+      <p:dialog header="Thêm địa bàn hoạt động của đại lý"
+            widgetVar="addNewDlg"
+            resizable="false"
+            id="addNewDlgId"
+            modal="true">
+          <p:fieldset legend="Thông tin" styleClass="addFieldSet">
+            <p:panelGrid id="newRecordPg" columns="2" style="border: none" styleClass="searchCriteriaGrid"
+              columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input">
+              <p:outputLabel value="Số thuê bao" />
+              <p:inputText styleClass="search-staff"
+                           value="#{agentAddressManagementController.newAgentAddressManagement.msisdn}" disabled="true" />
+              <p:outputLabel value="Miền" />
+              <p:inputText id="regionTxt" styleClass="search-staff"
+                           value="#{agentAddressManagementController.newAgentAddressManagement.region}" disabled="true" />
+              <p:outputLabel value="Tỉnh/Thành phố">
+              	<span class="red-star"
+                          style="margin: 0">*</span>
+              </p:outputLabel>
+
+              <p:selectOneMenu id="provinceTxt" label="tỉnh/thành phố" styleClass="select-bill"
+                      value="#{agentAddressManagementController.newAgentAddressManagement.province}"
+                      required="true" requiredMessage="Bạn phải nhập thông tin tỉnh/thành phố">
+                      <p:ajax event="change" listener="#{agentAddressManagementController.onChangeProvinceFieldForInsertingNewAgentCase}"
+                       	immediate="true" update="regionTxt districtTxt" />
+                      <f:selectItem itemLabel="" itemValue=""/>
+                      <f:selectItems value="#{agentAddressManagementController.provinceSelectItems}"/>
+              </p:selectOneMenu>
+              <p:outputLabel styleClass="emptySeperatorLabel"/>
+              <p:message for="provinceTxt" id="provinceTxtErrMsg" />
+              <p:outputLabel value="Quận/Huyện">
+              	<span class="red-star"
+                          style="margin: 0">*</span>	
+              </p:outputLabel>
+              <p:selectOneMenu id="districtTxt" label="quận/huyện" styleClass="select-bill"
+                      value="#{agentAddressManagementController.newAgentAddressManagement.district}"
+                      required="true" requiredMessage="Bạn phải nhập thông tin quận/huyện">
+                      <f:selectItem itemLabel="" itemValue=""/>
+                      <f:selectItems value="#{agentAddressManagementController.districtSelectItems}"/>
+              </p:selectOneMenu>    
+              <p:outputLabel styleClass="emptySeperatorLabel"/>
+              <p:message for="districtTxt" id="districtTxtErrMsg" />
+              <p:outputLabel value="Trạng thái"/>
+              <p:selectOneMenu styleClass="select-bill" value="#{agentAddressManagementController.newAgentAddressManagement.status}" >
+                <f:selectItems value="#{agentAddressManagementController.statusMap.entrySet()}" 
+                               var="rs" itemValue="#{rs.key}" itemLabel="#{rs.value}"></f:selectItems>
+              </p:selectOneMenu>
+            </p:panelGrid>
+  
+            <p:panelGrid columns="3" style="margin-top:20px" styleClass="searchCriteriaGrid">
+              <p:commandButton value="Chấp nhận"
+                               styleClass="commonButton"
+                               validateClient="true"
+                               actionListener="#{agentAddressManagementController.doCreateNewAgentAddress}"
+                               update=":frm1:newRecordPg :frm:resultList :frm:growl provinceTxtErrMsg districtTxtErrMsg"
+                               oncomplete="handleSavingData(xhr, status, args)" />
+              <p:commandButton value="Thoát"
+                               styleClass="commonButton"
+                               oncomplete="PF('addNewDlg').hide()" />
+              <p:panel styleClass="groupPanel">
+                <p:selectBooleanCheckbox id="open-status" value="#{agentAddressManagementController.displayPopup}"/>
+                <h:outputText value="Không ẩn popup" style="margin-left: 10px"/>
+              </p:panel>
+            </p:panelGrid>
+          </p:fieldset>
+        </p:dialog>
+      </h:form>
+      
+      <h:form id="frm2">
+      <p:dialog header="Chỉnh sửa bàn hoạt động của đại lý"
+            widgetVar="editCurDlg"
+            resizable="false"
+            id="addNewDlgId"
+            modal="true">
+          <p:fieldset legend="Thông tin" styleClass="addFieldSet">
+            <p:panelGrid id="newRecordPg" columns="2" style="border: none" styleClass="searchCriteriaGrid"
+               columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input">
+              <p:outputLabel value="Số thuê bao" />
+              <p:inputText styleClass="search-staff"
+                           value="#{agentAddressManagementController.editedAgentAddressManagement.msisdn}" disabled="true" />
+              <p:outputLabel value="Miền" />
+              <p:inputText id="regionTxt" styleClass="search-staff"
+                           value="#{agentAddressManagementController.editedAgentAddressManagement.region}" disabled="true" />
+              <p:outputLabel value="Tỉnh/Thành phố">
+              	<span class="red-star"
+                          style="margin: 0">*</span>
+              </p:outputLabel>
+              <p:selectOneMenu id="provinceTxt" label="tỉnh/thành phố" styleClass="select-bill"
+                      value="#{agentAddressManagementController.editedAgentAddressManagement.province}"
+                      required="true" requiredMessage="Bạn phải nhập thông tin tỉnh/thành phố">
+                      <p:ajax event="change" listener="#{agentAddressManagementController.onChangeProvinceFieldForUpdatingCurrAgentCase}" 
+                      	immediate="true" update="regionTxt districtTxt" />
+                      <f:selectItem itemLabel="" itemValue=""/>
+                      <f:selectItems value="#{agentAddressManagementController.provinceSelectItems}"/>
+              </p:selectOneMenu>
+              <p:outputLabel styleClass="emptySeperatorLabel"/>
+              <p:message for="provinceTxt" id="provinceTxtErrMsg" />
+              <p:outputLabel value="Quận/Huyện">
+              	<span class="red-star"
+                          style="margin: 0">*</span>	
+              </p:outputLabel>
+              <p:selectOneMenu id="districtTxt" label="quận/huyện" styleClass="select-bill"
+                     value="#{agentAddressManagementController.editedAgentAddressManagement.district}"
+                     required="true" requiredMessage="Bạn phải nhập thông tin quận/huyện">
+                      <f:selectItem itemLabel="" itemValue=""/>
+                      <f:selectItems value="#{agentAddressManagementController.districtSelectItems}"/>
+              </p:selectOneMenu>    
+              <p:outputLabel styleClass="emptySeperatorLabel"/>
+              <p:message for="districtTxt" id="districtTxtErrMsg" />
+              <p:outputLabel value="Trạng thái"/>
+              <p:selectOneMenu styleClass="select-bill" value="#{agentAddressManagementController.editedAgentAddressManagement.status}" >
+                <f:selectItems value="#{agentAddressManagementController.statusMap.entrySet()}" 
+                               var="rs" itemValue="#{rs.key}" itemLabel="#{rs.value}"></f:selectItems>
+              </p:selectOneMenu>
+            </p:panelGrid>
+  
+            <p:panelGrid columns="2" style="margin-top:20px" styleClass="searchCriteriaGrid">
+              <p:commandButton value="Chấp nhận"
+                               styleClass="commonButton"
+                               validateClient="true"
+                               actionListener="#{agentAddressManagementController.doUpdateCurrentAgentAddress}"
+                               update=":frm2:newRecordPg :frm:resultList :frm:growl provinceTxtErrMsg districtTxtErrMsg"
+                               oncomplete="handleUpdatingData(xhr, status, args)" />
+              <p:commandButton value="Thoát"
+                               styleClass="commonButton"
+                               oncomplete="PF('editCurDlg').hide()" />
+            </p:panelGrid>
+          </p:fieldset>
+        </p:dialog>
+        </h:form>
+      
+   <p:dialog id="comfirmation-dialog"
+              header="Xác nhận"
+              widgetVar="dlg-confirm"
+              resizable="false"
+              modal="true">
+      <h:form id="frmXacNhan" prependId="false">
+        <p:panel styleClass="main-panel-content">
+          <p:panelGrid columns="1" styleClass="searchCriteriaGrid">
+            <p:outputLabel value="Đại lý này chưa được phân vùng quản lí, bạn có muốn thêm địa bàn hoạt động cho đại lý không?"/>
+          </p:panelGrid>
+          <p:panelGrid columns="2" styleClass="searchCriteriaGrid" style="margin-top:20px">
+            <p:commandButton value="Có"
+                             style="margin-left: 30px"
+                             styleClass="commonButton"
+                             oncomplete="PF('dlg-confirm').hide(); PF('addNewDlg').show();"
+            				 actionListener="#{agentAddressManagementController.onCreateNewAgentAddress()}"
+            				 update=":frm1:addNewDlgId">
+                  <p:resetInput target=":frm1:addNewDlgId"/>
+            </p:commandButton>      
+            <p:commandButton value="Không"
+                             style="margin-left: 2px"
+                             styleClass="commonButton"
+                             validateClient="true"
+                             onclick="PF('dlg-confirm').hide();"/>
+          </p:panelGrid>
+        </p:panel>
+      </h:form>
+    </p:dialog>  
+      <script type="text/javascript">
+	      function handleSavingData(xhr, status, args) {
+	        var openStatus = $('#frm1\\:open-status').find("span").hasClass("ui-icon-check");
+	        if(args.validationFailed || !args.updateStatus){
+	          //PF('addNewReasonDlg').jq.effect("shake", {times:5}, 100);
+	        } else if (!openStatus){
+	          PF('addNewDlg').hide();
+	        }
+	      }
+	      function handleUpdatingData(xhr, status, args) {
+	          if(args.validationFailed || !args.updateStatus){
+	            //PF('editReasonDlg').jq.effect("shake", {times:5}, 100);
+	          } else {
+	            PF('editCurDlg').hide();
+	          }
+	      }
+      </script>  
+  </ui:define>
+
+</ui:composition>
+

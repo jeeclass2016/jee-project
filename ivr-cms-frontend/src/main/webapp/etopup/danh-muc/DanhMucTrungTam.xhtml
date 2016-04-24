@@ -1,0 +1,268 @@
+<ui:composition template="/include/etopup/layout-etopup-danhmuc.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+  <ui:define name="lib-header">
+  </ui:define>
+  <ui:define name="content">
+    <h:form id="frmDanhMucTrungTam">
+      <p:hotkey bind="f9"/>
+      <p:growl id="messages" showDetail="true" autoUpdate="true" globalOnly="true"/>
+      <table style="width: 100%; height: 100%">
+        <tbody>
+        <tr>
+          <td class="menu-left">
+            <ui:insert>
+              <ui:include src="/include/etopup/menu-top-left-etopup-danhmuc.xhtml"/>
+            </ui:insert>
+          </td>
+          <td class="wr-main">
+            <div class="main">
+              <div class="top-bar-content">
+                <div class="origin">
+                  <a href="#{request.contextPath}/home/index.xhtml">Trang chủ</a>&#187;
+                  <a class="here">Danh mục</a>&#187;
+                  <a class="here">Danh mục trung tâm</a>
+                </div>
+              </div>
+              <p:panel id="searchPanel" styleClass="main-panel-content">
+                <p:focus context="searchPanel"/>
+                <p:fieldset id="search-fieldset" legend="Thông tin tìm kiếm" styleClass="searchFieldSet">
+                  <!--p:messages id="message-search-panel"/-->
+                  <p:panelGrid columns="4" styleClass="searchCriteriaGrid"
+                               columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label, searchCriteriaGrid-input">
+                    <p:outputLabel value="Mã trung tâm"/>
+                    <p:inputText id="centrecode"
+                                 value="#{centreListController.centreDTO.code}"
+                                 styleClass="search-staff"
+                                 label="Mã trung tâm">
+                    </p:inputText>
+
+                    <p:outputLabel value="Tên trung tâm"/>
+                    <p:inputText id="centrename"
+                                 value="#{centreListController.centreDTO.name}"
+                                 label="Tên trung tâm"
+                                 styleClass="search-staff">
+                    </p:inputText>
+                    <p:outputLabel value="Trạng thái"/>
+                    <p:selectOneMenu id="status"
+                                     styleClass="select-bill"
+                                     value="#{centreListController.centreDTO.status}">
+                      <f:selectItem itemLabel="Tất cả" itemValue="-1"/>
+                      <f:selectItems value="#{centreListController.statusList}"/>
+                    </p:selectOneMenu>
+                  </p:panelGrid>
+                  <p:panelGrid columns="1" styleClass="searchCriteriaGrid" style="margin-top:10px">
+                    <p:commandButton value="Tìm kiếm"
+                                     styleClass="commonButton"
+                                     actionListener="#{centreListController.doFindCentre}"
+                                     onclick="PF('tableWidget').getPaginator().setPage(0), PF('blockEntirePage').show()"
+                                     oncomplete="PF('blockEntirePage').hide()"
+                                     update=":frmDanhMucTrungTam:centre-list-fieldset">
+                    </p:commandButton>
+                  </p:panelGrid>
+                </p:fieldset>
+                <p:fieldset id="centre-list-fieldset" legend="Danh sách trung tâm" styleClass="resultFieldSet">
+                  <p:commandButton value="Thêm"
+                                   styleClass="commonButton"
+                                   style="margin-bottom:15px; margin-left:15px"
+                                   actionListener="#{centreListController.openAddCentreDialog}"
+                                   update=":frmChinhSuaTrungTam, :edit-centre-dialog"
+                                   oncomplete="PF('dlg-edit-centre').show()">
+                    <p:resetInput target=":edit-centre-dialog"/>
+                  </p:commandButton>
+                  <p:dataTable styleClass="table-list ft-left p-data-table resultDataTable"
+                               id="centre-list-table"
+                               columnClasses="col-15,col-20,col-10,col-10,col-10,col-10,col-15,col-10"
+                               paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                               paginator="true"
+                               rows="15"
+                               emptyMessage="Không có bản ghi nào."
+                               value="#{centreListController.centreLazyDataModel}"
+                               var="centre"
+                               resizableColumns="true"
+                               paginatorPosition="bottom"
+                               selectionMode="single"
+                               lazy="true"
+                               widgetVar="tableWidget"
+                               rowKey="#{centre.centreId}">
+                    <p:ajax event="page" update=":frmDanhMucTrungTam:msgAfterTable"/>
+                    <p:ajax event="sort" update=":frmDanhMucTrungTam:msgAfterTable"/>
+
+                    <p:column headerText="Mã trung tâm" width="120"
+                              styleClass="text-column-in-datatable"
+                              sortBy="code">
+                      <p:outputLabel value="#{centre.code}"/>
+                    </p:column>
+                    <p:column headerText="Tên trung tâm"
+                              styleClass="text-column-in-datatable"
+                              sortBy="name">
+                      <p:outputLabel value="#{centre.name}"/>
+                    </p:column>
+                    <p:column headerText="Trạng thái" width="120"
+                              styleClass="text-column-in-datatable">
+                      <p:outputLabel value="#{centreListController.getStatusName(centre.status)}"/>
+                    </p:column>
+                    <p:column width="60">
+                      <p:commandLink title="Chỉnh sửa" styleClass="bt-edit"
+                                     id="btn-edit-centre"
+                                     actionListener="#{centreListController.doEditCentre(centre)}"
+                                     oncomplete="PF('dlg-edit-centre').show()"
+                                     update=":frmChinhSuaTrungTam, :edit-centre-dialog">
+                        <p:resetInput target=":edit-centre-dialog"/>
+                      </p:commandLink>
+                      <p:commandLink title="Xóa" styleClass="bt-delete-2"
+                                     actionListener="#{centreListController.bindAndValidate(centre.centreId, centre.status)}"
+                                     id="btn-delete-centre"
+                                     update=":frmDanhMucTrungTam:messages"
+                                     oncomplete="validateCentreBeforeDelete(xhr, status, args);">
+                      </p:commandLink>
+
+                    </p:column>
+                  </p:dataTable>
+                </p:fieldset>
+              </p:panel>
+            </div>
+
+          </td>
+        </tr>
+        </tbody>
+      </table>
+
+      <!-- <p:blockUI block="frmDanhMucTrungTam" widgetVar="blockFindCentre">
+       <p:outputLabel value="Đang tìm" style="margin-right:10px"/>
+       <p:graphicImage value="/content/images/ajax-loader.gif"/>
+     </p:blockUI> -->
+      <p:growl id="msgAfterTable" showDetail="true"/>
+    </h:form>
+    <p:confirmDialog global="true"
+                     showEffect="fade"
+                     hideEffect="explode">
+      <h:form>
+        <p:commandButton value="Yes"
+                         type="button"
+                         styleClass="ui-confirmdialog-yes"
+                         icon="ui-icon-check"/>
+        <p:commandButton value="No"
+                         type="button"
+                         styleClass="ui-confirmdialog-no"
+                         icon="ui-icon-close"/>
+      </h:form>
+    </p:confirmDialog>
+    <p:dialog id="edit-centre-dialog"
+              header="#{centreListController.popupTitle}"
+              widgetVar="dlg-edit-centre"
+              width="600"
+              resizable="false"
+              modal="true">
+      <h:form id="frmChinhSuaTrungTam" prependId="false">
+        <p:panel styleClass="main-panel-content">
+          <!-- p:messages id="message-edit-popup"/-->
+          <p:fieldset id="edit-popup-fieldset" legend="Thông tin chỉnh sửa" styleClass="addFieldSet">
+            <p:panelGrid columns="2" styleClass="searchCriteriaGrid" id="edit-popup-input-area"
+            	columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input">
+              <p:outputLabel value="Mã trung tâm">
+                    <span class="red-star"
+                          style="margin: 0">*</span>
+              </p:outputLabel>
+              <p:inputText id="centrecode-id"
+                           label="Mã trung tâm"
+                           styleClass="search-staff"
+                           value="#{centreListController.centreDataForEditing.code}"
+                           required="true">
+                <f:validator validatorId="etopupCentreManagementCentreCodeValidator"/>
+              </p:inputText>
+              <p:outputLabel/>
+              <p:message for="centrecode-id"/>
+
+              <p:outputLabel value="Tên trung tâm">
+                   <span class="red-star"
+                         style="margin: 0">*</span>
+              </p:outputLabel>
+              <p:inputText id="centrename-id"
+                           value="#{centreListController.centreDataForEditing.name}"
+                           label="Tên trung tâm"
+                           styleClass="search-staff"
+                           required="true">
+                <f:validateLength maximum="200"/>
+                <f:validator validatorId="etopupCentreManagementCentreNameValidator"/>
+              </p:inputText>
+              <p:outputLabel/>
+              <p:message for="centrename-id"/>
+
+              <p:outputLabel value="Trạng thái"/>
+              <p:selectOneMenu id="status-id"
+                               styleClass="select-bill"
+                               value="#{centreListController.centreDataForEditing.status}">
+                <f:selectItems value="#{centreListController.statusList}"/>
+              </p:selectOneMenu>
+            </p:panelGrid>
+            <p:panelGrid columns="3" style="margin-top:20px" styleClass="searchCriteriaGrid">
+              <p:commandButton value="Chấp nhận"
+                               style="margin-left: 100px"
+                               styleClass="commonButton"
+                               actionListener="#{centreListController.doUpdateCentre}"
+                               validateClient="true"
+                               oncomplete="handleSavingData(xhr, status, args);"
+                               update=":frmDanhMucTrungTam:centre-list-table, :frmDanhMucTrungTam:messages, :frmChinhSuaTrungTam:edit-popup-input-area"/>
+              <p:commandButton value="Thoát"
+                               style="margin-left: 5px"
+                               styleClass="commonButton"
+                               oncomplete="PF('dlg-edit-centre').hide();"/>
+              <p:panel styleClass="groupPanel" rendered="#{centreListController.renderCheckbox}">
+                <input type="checkbox"
+                       id="open-status"
+                       checked="yes"
+                       style="margin-top: 5px; float:left"/>
+                <h:outputText value="Không ẩn popup" style="margin-left: 10px"/>
+              </p:panel>
+            </p:panelGrid>
+          </p:fieldset>
+        </p:panel>
+      </h:form>
+    </p:dialog>
+    <p:dialog id="delete-comfirmation-dialog"
+              header="Xác nhận"
+              widgetVar="dlg-delete-centre"
+              resizable="false"
+              modal="true">
+      <h:form id="frmXacNhanXoaTrungTam" prependId="false">
+        <p:panel styleClass="main-panel-content">
+          <p:panelGrid columns="1" styleClass="searchCriteriaGrid">
+            <p:outputLabel value="Bạn có thực sự muốn xoá trung tâm này?"/>
+          </p:panelGrid>
+          <p:panelGrid columns="2" styleClass="searchCriteriaGrid" style="margin-top:20px">
+            <p:commandButton value="Có"
+                             style="margin-left: 30px"
+                             styleClass="commonButton"
+                             actionListener="#{centreListController.doDeleteCentre()}"
+                             oncomplete="PF('dlg-delete-centre').hide();"
+                             update=":frmDanhMucTrungTam:centre-list-table, :frmDanhMucTrungTam:messages"/>
+            <p:commandButton value="Không"
+                             style="margin-left: 2px"
+                             styleClass="commonButton"
+                             validateClient="true"
+                             onclick="PF('dlg-delete-centre').hide();"/>
+          </p:panelGrid>
+        </p:panel>
+      </h:form>
+    </p:dialog>
+    <script type="text/javascript">
+      function handleSavingData(xhr, status, args) {
+        var openStatus = $('#open-status').prop('checked');
+        if (args.validationFailed || !args.updateStatus) {
+          //PF('dlg-edit-centre').jq.effect("shake", {times:5}, 100);
+        } else if (!openStatus) {
+          PF('dlg-edit-centre').hide();
+        }
+      }
+      function validateCentreBeforeDelete(xhr, status, args) {
+        if (args.canDelete) {
+          PF('dlg-delete-centre').show();
+        }
+      }
+    </script>
+  </ui:define>
+</ui:composition>

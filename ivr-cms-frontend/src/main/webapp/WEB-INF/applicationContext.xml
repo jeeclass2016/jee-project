@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans
+  http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+  http://www.springframework.org/schema/context
+  http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+  <context:annotation-config />
+  <context:component-scan base-package="com.vietsci.cms.frontend" />
+
+
+  <bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
+    <property name="messageConverters">
+      <list>
+        <ref bean="jsonConverter" />
+      </list>
+    </property>
+    <property name="errorHandler" ref="cmsRestErrorHandler"></property>
+  </bean>
+
+  <bean id="jsonConverter"
+    class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+    <property name="supportedMediaTypes" value="application/json" />
+  </bean>
+  <bean id="cmsRestErrorHandler"
+    class="com.vietsci.cms.frontend.exception.CmsRestExceptionHandler">
+  </bean>
+</beans>

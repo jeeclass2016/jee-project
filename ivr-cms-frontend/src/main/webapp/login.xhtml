@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+<f:view locale="#{languageController.currentLocale}">
+<h:head>
+  <meta charset="utf-8" />
+  <link rel="shortcut icon" href="#{request.contextPath}/content/images/favicon.png" />
+  <title>CMS</title>
+  <link rel="stylesheet" href="#{request.contextPath}/content/css/style.css" />
+  <link rel="stylesheet" href="#{request.contextPath}/content/css/reset.css" />
+  <link rel="stylesheet" type="text/css" href="#{request.contextPath}/content/css/customized-primefaces.css" />
+</h:head>
+
+<h:body styleClass="bgr-login">
+  <div class="wr-login">
+    <img src="#{request.contextPath}/content/images/logo-epos.png" width="150" height="150"
+      alt="CMS" style="margin: 0 140px" />
+    <h1>CMS</h1>
+    <h2>Content Management System</h2>
+    <div class="form-login">
+      <h:form id="form">
+        <h1><h:outputText value="#{t['login.title']}"/></h1>
+        <p:messages id="messages" autoUpdate="true" closable="true" globalOnly="true" showDetail="true"/>
+        <p:commandLink ajax="false" styleClass="language language-vn" action="#{languageController.changeLanguage('vi')}" immediate="true"/>
+        <p:commandLink ajax="false" styleClass="language language-eng" action="#{languageController.changeLanguage('en')}" immediate="true"/>
+        <p>
+          <label for="login" class="user-name"> <h:outputText value="#{t['login.username']}"/> </label>
+          <h:inputText id="username" value="#{auth.userName}" required="true" label="#{t['login.username']}" />
+          <p:message for="username" /> 
+        </p>
+        <p>
+          <label for="login" class="password"> <h:outputText value="#{t['login.password']}"/> </label>
+          <h:inputSecret id="password" value="#{auth.password}" required="true" label="#{t['login.password']}"/>
+          <p:message for="password" />
+          <a href="#" class="grey"><h:outputText value="#{t['login.forgotpassword']}"/> </a>
+        </p>
+        <p>
+          <p:commandButton styleClass="bt-login" type="submit" value="#{t['login.submit']}" style="width:auto;" ajax="false" action="#{auth.login}" />
+        </p>
+      </h:form>
+    </div>
+ <!--    <img src="#{request.contextPath}/content/images/logo-hanoitelecom.png" height="100" alt="CMS"
+      style="position: absolute; bottom: 0; left: 0" /> <img
+      src="#{request.contextPath}/content/images/logo-vietnammobile.png" width="100" height="100"
+      alt="CMS" style="position: absolute; bottom: 0; right: 15px" /> -->
+
+  </div>
+</h:body>
+</f:view>
+</html>
+

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core">
+
+<f:view locale="#{languageController.currentLocale}">
+	<h:head>
+		<meta charset="utf-8"></meta>
+
+		<link rel="shortcut icon"
+			href="#{request.contextPath}/content/images/favicon.png" />
+
+		<title>ePOS</title>
+
+		<link rel="stylesheet" type="text/css"
+			href="#{request.contextPath}/content/css/reset.css" />
+		<link rel="stylesheet" type="text/css"
+			href="#{request.contextPath}/content/css/style-etopup.css" />
+		<!-- start picker day -->
+		<link rel="stylesheet" type="text/css"
+			href="#{request.contextPath}/content/css/epoch_styles.css" />
+		<link rel="stylesheet" type="text/css"
+			href="#{request.contextPath}/content/css/customized-primefaces.css" />
+
+		<script src="#{request.contextPath}/script/menu-epos.js" />
+		<script src="#{request.contextPath}/script/common-epos.js" />
+		<script src="#{request.contextPath}/script/epoch_classes.js" />
+
+		<script type="text/javascript">
+      $(document).ready(function() {
+        $('#menu1 > li > a.expanded + ul').show();
+        setTimeOutMenu();
+        center()//gọi hàm mới load web 
+        $(window).resize(function() {
+          center()
+        })//gọi hàm khi resize 
+      });
+    </script>
+
+		<script>
+  /* Primefaces localization */
+  PrimeFaces.locales['vi'] = {
+      closeText: 'Tắt',
+      prevText: 'Tháng trước',
+      nextText: 'Tháng sau',
+      monthNames: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+      monthNamesShort: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12' ],
+      dayNames: ['Chúa Nhựt', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'],
+      dayNamesShort: ['CN', 'Hai', 'Ba', 'Tư', 'Năm', 'Sáu', 'Bảy'],
+      dayNamesMin: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+      weekHeader: 'Tuần',
+      firstDay: 1,
+      isRTL: false,
+      showMonthAfterYear: false,
+      yearSuffix:'',
+      timeOnlyTitle: 'Chọn giờ',
+      timeText: 'Giờ',
+      hourText: 'Giờ',
+      minuteText: 'Phút',
+      secondText: 'Giây',
+      currentText: 'Giờ hiện hành',
+      ampm: false,
+      month: 'Tháng',
+      week: 'Tuần',
+      day: 'Ngày',
+      allDayText: 'Cả ngày'
+  };    
+  </script>
+		<!-- căn pop-up giữa màn hình-->
+		<ui:insert name="lib-header"></ui:insert>
+	</h:head>
+
+	<h:body id="entirePage">
+		<div class="wrapper">
+
+			<div class="header">
+				<ui:insert name="header">
+					<ui:include src="/include/header.xhtml"></ui:include>
+				</ui:insert>
+			</div>
+
+			<div class="menu-top">
+				<ui:insert name="menu-top">
+					<ui:include src="/include/etopup/menu-top-etopup-danhmuc.xhtml"/>
+				</ui:insert>
+			</div>
+			<ui:insert name="content">
+			</ui:insert>
+		</div>
+		<ui:debug hotkey="x"
+			rendered="#{facesContext.application.projectStage == 'Development'}" />
+		<!-- Xuan.NguyenMai added for eTopUp module -->
+    <p:confirmDialog global="true" showEffect="fade"  width="315">
+      <h:form>
+        <p:commandButton value="Có" type="button"
+                         styleClass="ui-confirmdialog-yes commonButton"
+                         style="margin-left:25%"
+                         icon="ui-icon-check"/>
+        <p:commandButton value="Không" type="button"
+                         styleClass="ui-confirmdialog-no commonButton"
+                         style="margin-left:10px"
+                         icon="ui-icon-close"/>
+      </h:form>
+    </p:confirmDialog>
+
+		<p:blockUI block=":entirePage" widgetVar="blockEntirePage">
+		  <p:outputLabel value="Đang xử lý" style="margin-right:10px"/>
+		  <p:graphicImage value="/content/images/ajax-loader.gif"/>
+		</p:blockUI>
+
+	</h:body>
+</f:view>
+</html>

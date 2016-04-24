@@ -1,0 +1,134 @@
+<ui:composition template="/include/etopup/layout-etopup-quantridaily.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:o="http://omnifaces.org/ui">
+
+  <ui:define name="lib-header">
+  </ui:define>
+  <ui:define name="content">
+    <h:form id="iccidRangeDeletionForm">
+      <p:growl id="growl" showDetail="true" autoUpdate="true" globalOnly="true"/>
+      <table style="width: 100%; height: 100%">
+        <tbody>
+        <tr>
+          <td class="menu-left">
+            <ui:insert><ui:include src="/include/etopup/menu-top-left-etopup-quantridaily.xhtml"/></ui:insert>
+          </td>
+          <td class="wr-main">
+            <div class="main">
+              <div class="top-bar-content">
+                <div class="origin">
+                  <a href="#{request.contextPath}/home/index.xhtml">Trang chủ</a>&#187;
+                  <a class="here">Quản trị đại lý</a>&#187;
+                  <a class="here">Xóa dải ICCID</a>
+                </div>
+              </div>
+
+              <p:panel styleClass="main-panel-content">
+                <p:fieldset id="searchFieldSetId" legend="Nhập thông tin tìm kiếm" styleClass="searchFieldSet">
+                  <p:focus context="searchFieldSetId"/>
+                  <p:panelGrid columns="5" styleClass="searchCriteriaGrid"
+                               columnClasses="searchCriteriaGrid-label, searchCriteriaGrid-input, searchCriteriaGrid-label,searchCriteriaGrid-label, searchCriteriaGrid-input">
+                    <p:outputLabel value="Tên file"/>
+                    <p:inputText id="fileName" styleClass="commonInputText"
+                                 value="#{iccidRangeDeletionEtopupController.iccidRangeDeletionDTO.fileName}"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+
+                    <p:outputLabel value="Ngày tạo"/>
+                    <p:calendar id="createdDate" styleClass="commonCalendarTextInput"
+                                showButtonPanel="true"
+                                navigator="true"
+                                value="#{iccidRangeDeletionEtopupController.iccidRangeDeletionDTO.createdDate}"
+                                mode="popup"
+                                pattern="dd/MM/yyyy"
+                                placeholder="Click để chọn ngày..."/>
+
+                    <p:outputLabel value="Từ số ICCID"/>
+                    <p:inputText id="iccidStart" styleClass="commonInputText" label="ICCID"
+                                 value="#{iccidRangeDeletionEtopupController.iccidRangeDeletionDTO.iccidStart}">
+                      <o:validator validatorId="numberValidator"/>
+                      <f:validateLength minimum="19" maximum="20"/>
+                    </p:inputText>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+
+                    <p:outputLabel value="Đến số ICCID"/>
+                    <p:inputText id="iccidEnd" styleClass="commonInputText" label="ICCID"
+                                 value="#{iccidRangeDeletionEtopupController.iccidRangeDeletionDTO.iccidEnd}">
+                      <o:validator validatorId="numberValidator"/>
+                      <f:validateLength minimum="19" maximum="20"/>
+                    </p:inputText>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message id="messageForICCIDStart" for="iccidStart"/>
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+
+                    <p:outputLabel styleClass="emptySeperatorLabel"/>
+                    <p:message id="messageForICCIDEnd" for="iccidEnd"/>
+                  </p:panelGrid>
+
+                  <p:panelGrid columns="1" styleClass="searchCriteriaGrid">
+                    <p:commandButton id="searchBtn"
+                                     value="Tìm"
+                                     styleClass="commonButton"
+                                     onclick="PF('blockEntirePage').show()"
+                                     oncomplete="PF('blockEntirePage').hide()"
+                                     update=":iccidRangeDeletionForm:growl iccidDataTableId searchFieldSetId"
+                                     actionListener="#{iccidRangeDeletionEtopupController.doFindICCIDs}"/>
+                  </p:panelGrid>
+                </p:fieldset>
+
+                <p:fieldset id="iccidInfoFieldSet" legend="Chi tiết"
+                            styleClass="resultFieldSet">
+                  <p:dataTable styleClass="table-list ft-left resultDataTable"
+                               id="iccidDataTableId"
+                               widgetVar="resultTableWidget"
+                               paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                               paginator="true"
+                               rows="15"
+                               emptyMessage="Không tìm thấy kết quả tìm kiếm"
+                               rowKey="#{loadedSim.id}"
+                               lazy="true"
+                               paginatorPosition="bottom"
+                               resizableColumns="true"
+                               value="#{iccidRangeDeletionEtopupController.iccidRangeDeletionLazyDataModel}"
+                               var="loadedSim"
+                               selection="#{iccidRangeDeletionEtopupController.selectedICCIDs}">
+                    <p:column headerText="Tên file">
+                      <p:outputLabel value="#{loadedSim.simBatch.fileName}"/>
+                    </p:column>
+                    <p:column headerText="Ngày tạo" sortBy="#{loadedSim.created}">
+                      <p:outputLabel value="#{loadedSim.created}"><f:convertDateTime pattern="dd/MM/yyyy"/></p:outputLabel>
+                    </p:column>
+                    <p:column headerText="Số lượng SIM" sortBy="#{loadedSim.simBatch.entries}">
+                      <p:outputLabel value="#{loadedSim.simBatch.entries}"></p:outputLabel>
+                    </p:column>
+                    <p:column headerText="ICCID" sortBy="#{loadedSim.iccid}">
+                      <p:outputLabel value="#{loadedSim.iccid}"/>
+                    </p:column>
+                    <p:column selectionMode="multiple" style="width: 2%" />
+                  </p:dataTable>
+                </p:fieldset>
+
+                <p:panelGrid columns="1" styleClass="searchCriteriaGrid" style="margin-top: 10px;">
+                  <p:commandButton id="deleteBtn"
+                                   value="Xóa"
+                                   styleClass="commonButton"
+                                   onclick="PF('blockEntirePage').show()"
+                                   oncomplete="PF('blockEntirePage').hide()"
+                                   actionListener="#{iccidRangeDeletionEtopupController.doDeleteICCIDs}"
+                                   update="iccidDataTableId"/>
+                </p:panelGrid>
+              </p:panel>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </h:form>
+  </ui:define>
+
+</ui:composition>
+
